@@ -32,6 +32,11 @@ from stock_engine.analytics.factor_investing import (
     cross_validate,
 )
 from stock_engine.analytics.factor_investing.loader import load_qspread_series
+from stock_engine.analytics.factor_investing.theory import (
+    FACTOR_THEORY,
+    PORTFOLIO_CONSTRUCTION,
+    FactorEntry,
+)
 from stock_engine.config import Config
 from stock_engine.ui.components.simple_mode.session import get_session, save_session, set_step
 from stock_engine.ui.styles import inject as _inject_css
@@ -692,6 +697,74 @@ def _render_score_portfolio(result: FactorInvestingResult) -> None:
                 _apply_tilt(scores)
 
 
+def _render_theory(selected_factors: list[str]) -> None:
+    """Render theoretical background, LaTeX formulas, and portfolio construction logic."""
+
+    # ── Portfolio construction ─────────────────────────────────────────────────
+    pc = PORTFOLIO_CONSTRUCTION
+    with st.expander("Portfolio Construction Methodology", expanded=True):
+        st.markdown(
+            "**Universe:** " + pc["universe"],
+            unsafe_allow_html=False,
+        )
+        st.markdown("**Step-by-step procedure:**")
+        for i, (step_name, step_desc) in enumerate(pc["steps"], start=1):
+            st.markdown(f"**{i}. {step_name}** — {step_desc}")
+
+        st.markdown("**Winsorized characteristic sort:**")
+        st.latex(pc["sort_formula_tex"])
+        st.markdown("**Equal-weight within quintile:**")
+        st.latex(pc["equal_weight_formula_tex"])
+        st.markdown("**Q-spread (long Q5, short Q1):**")
+        st.latex(pc["qspread_formula_tex"])
+        st.markdown("**Annualized Sharpe ratio:**")
+        st.latex(pc["annualized_sharpe_tex"])
+        st.markdown("**t-statistic (H₀: mean Q-spread = 0):**")
+        st.latex(pc["t_stat_tex"])
+
+    st.markdown('<div class="fi-config-sep" style="margin:12px 0"></div>',
+                unsafe_allow_html=True)
+
+    # ── Per-factor cards ───────────────────────────────────────────────────────
+    st.markdown(
+        '<div class="fi-results-bar">'
+        "FACTOR REFERENCE"
+        '<span class="fi-results-count">academic foundation + formulas</span>'
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+    factors_to_show = selected_factors if selected_factors else list(FACTOR_THEORY.keys())
+    for factor_key in factors_to_show:
+        entry: FactorEntry | None = FACTOR_THEORY.get(factor_key)
+        if entry is None:
+            continue
+
+        with st.expander(f"{entry.name}  ·  {entry.category}", expanded=False):
+            # Intuition banner
+            st.markdown(
+                f'<div class="fi-results-bar" style="margin-bottom:8px">'
+                f'<em>{entry.intuition}</em>'
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+
+            # Theory text
+            for para in entry.description.split("\n\n"):
+                st.markdown(para)
+
+            # Formulas
+            st.markdown("**Factor characteristic:**")
+            st.latex(entry.formula_tex)
+            st.markdown("**Q-spread (long-short) return:**")
+            st.latex(entry.qspread_tex)
+
+            # References
+            st.markdown("**Key references:**")
+            for ref in entry.references:
+                st.caption(f"• {ref}")
+
+
 def _render_validation(val_results: list[ValidationResult]) -> None:
     """Render the factor reliability / cross-validation table."""
     if not val_results:
@@ -831,10 +904,15 @@ def render_page_factor_investing(config: Config) -> None:
 
             val_results: Optional[list] = st.session_state.get(_K_VALIDATION)
 
+            selected_factors: list[str] = [
+                f for f in CORE_FACTORS
+                if st.session_state.get(f"fi_factor_{f}", True)
+            ]
+
             with st.container(key="fi_subtabs"):
                 tab_labels = ["Overview", "L/S Returns", "Correlations",
-                              "Score My Portfolio", "Validation"]
-                tab1, tab2, tab3, tab4, tab5 = st.tabs(tab_labels)
+                              "Score My Portfolio", "Theory", "Validation"]
+                tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(tab_labels)
 
             with tab1:
                 _render_overview(result)
@@ -845,4 +923,6 @@ def render_page_factor_investing(config: Config) -> None:
             with tab4:
                 _render_score_portfolio(result)
             with tab5:
+                _render_theory(selected_factors)
+            with tab6:
                 _render_validation(val_results or [])
