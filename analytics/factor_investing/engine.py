@@ -12,6 +12,10 @@ from typing import Optional
 
 import pandas as pd
 
+from stock_engine.analytics.factor_investing.live_compute import (
+    PRICE_COMPUTABLE,
+    compute_live_factors,
+)
 from stock_engine.analytics.factor_investing.live_loader import load_french_factors
 from stock_engine.analytics.factor_investing.loader import (
     load_qspread_series,
@@ -175,6 +179,74 @@ class FactorInvestingEngine:
             quintile_returns=quintile_returns,
             correlation=correlation,
             source="live",
+            as_of_date=as_of_date,
+            qspread_series=qspread_dict,
+        )
+
+    def run_compute(
+        self,
+        factors: list[str] | None = None,
+        start: str | None = None,
+        progress_cb=None,
+    ) -> FactorInvestingResult:
+        """Tier-2: compute factor Q-spreads from live yfinance daily price data.
+
+        Price-computable factors (MOM, HL1M, Beta, AnnVol12M, LogMktCap) are
+        computed from scratch using S&P 500 daily data.  Remaining factors
+        (BP, LTGC) are supplemented from the Fama-French live_loader so the
+        result always contains all requested factors.
+
+        Parameters
+        ----------
+        factors:
+            Subset of CORE_FACTORS to analyse.  Defaults to all seven.
+        start:
+            ISO date string for the start of the Q-spread output series.
+        progress_cb:
+            Optional callable(str) forwarded to compute_live_factors for UI feedback.
+
+        Returns
+        -------
+        FactorInvestingResult with source="computed".
+        """
+        factors = factors or CORE_FACTORS
+
+        price_factors = [f for f in factors if f in PRICE_COMPUTABLE]
+        ff_factors    = [f for f in factors if f not in PRICE_COMPUTABLE]
+
+        # ── Tier-2: price-based computation ───────────────────────────────────
+        qspread_dict: dict[str, pd.Series] = {}
+        if price_factors:
+            computed = compute_live_factors(
+                factors=price_factors,
+                start=start,
+                progress_cb=progress_cb,
+            )
+            qspread_dict.update(computed)
+
+        # ── Supplement missing factors from French library ─────────────────────
+        if ff_factors:
+            ff_data = load_french_factors(factors=ff_factors, start=start)
+            # Align date range to computed series if possible
+            if qspread_dict:
+                min_date = min(s.index.min() for s in qspread_dict.values())
+                ff_data = {k: v[v.index >= min_date] for k, v in ff_data.items()}
+            qspread_dict.update(ff_data)
+
+        # ── Statistics ────────────────────────────────────────────────────────
+        factor_stats: list[FactorStats] = []
+        for factor_name in factors:
+            series = qspread_dict.get(factor_name, pd.Series(dtype=float))
+            factor_stats.append(compute_factor_stats(factor_name, series))
+
+        correlation = compute_correlation_matrix(qspread_dict)
+        as_of_date  = self._determine_as_of_date(qspread_dict)
+
+        return FactorInvestingResult(
+            factor_stats=factor_stats,
+            quintile_returns=[],
+            correlation=correlation,
+            source="computed",
             as_of_date=as_of_date,
             qspread_series=qspread_dict,
         )

@@ -431,30 +431,40 @@ def _run_analysis(
         st.warning("Select at least one factor.")
         return
 
-    with st.spinner("Loading factor data…"):
-        engine = FactorInvestingEngine(
-            capitaliq_path=capitaliq_path or None,
-            factor_sp500_path=factor_sp500_path or None,
-        )
-        if source == "live":
-            result = engine.run_live(factors=factors, start=start)
-        else:
-            result = engine.run_quick(factors=factors)
+    engine = FactorInvestingEngine(
+        capitaliq_path=capitaliq_path or None,
+        factor_sp500_path=factor_sp500_path or None,
+    )
 
-        st.session_state[_K_RESULT] = result
-        st.session_state[_K_SCORES] = None
-        st.session_state[_K_VALIDATION] = None
+    if source == "compute":
+        # Tier-2: show live progress during long computation
+        status_box = st.empty()
+        def _progress(msg: str) -> None:
+            status_box.info(f"⏳ {msg}")
 
-        # Cross-validation against static reference if path provided
+        result = engine.run_compute(factors=factors, start=start, progress_cb=_progress)
+        status_box.empty()
+    else:
+        with st.spinner("Loading factor data…"):
+            if source == "live":
+                result = engine.run_live(factors=factors, start=start)
+            else:
+                result = engine.run_quick(factors=factors)
+
+    st.session_state[_K_RESULT] = result
+    st.session_state[_K_SCORES] = None
+    st.session_state[_K_VALIDATION] = None
+
+    # Cross-validation against static reference (live or computed modes)
+    if source in ("live", "compute") and result.qspread_series:
         vpath = validation_path.strip() if validation_path else _VALIDATION_CAPITALIQ_DEFAULT
-        if source == "live" and result.qspread_series:
-            try:
-                static_dict = load_qspread_series(vpath, factors=factors)
-                if static_dict:
-                    val_results = cross_validate(result.qspread_series, static_dict)
-                    st.session_state[_K_VALIDATION] = val_results
-            except Exception:
-                pass  # Validation is optional; never block primary flow
+        try:
+            static_dict = load_qspread_series(vpath, factors=factors)
+            if static_dict:
+                val_results = cross_validate(result.qspread_series, static_dict)
+                st.session_state[_K_VALIDATION] = val_results
+        except Exception:
+            pass
 
     st.rerun()
 
@@ -471,14 +481,18 @@ def _render_config_pane(config: Config) -> tuple[list[str], str, str, str, str, 
 
     # ── Data source ───────────────────────────────────────────────────────────
     st.markdown('<div class="fi-config-label">DATA SOURCE</div>', unsafe_allow_html=True)
+    _SRC_LABELS = {
+        "live":    "Live · Fama-French",
+        "compute": "Compute · Daily data",
+        "custom":  "Custom File",
+    }
     source = st.radio(
         "Data source",
-        ["live", "custom"],
+        list(_SRC_LABELS.keys()),
         index=0,
         key="fi_data_source",
-        format_func=lambda v: "Live · Fama-French" if v == "live" else "Custom File",
+        format_func=_SRC_LABELS.get,
         label_visibility="collapsed",
-        horizontal=True,
     )
 
     capitaliq_path = ""
@@ -486,6 +500,12 @@ def _render_config_pane(config: Config) -> tuple[list[str], str, str, str, str, 
 
     if source == "live":
         st.caption("Downloads from Kenneth French's Data Library · Updated monthly")
+    elif source == "compute":
+        st.caption(
+            "Downloads S&P 500 daily prices via yfinance, computes 5 price-based "
+            "factors from scratch. BP/LTGC supplemented from Fama-French. "
+            "First run: ~1-2 min · cached 24h."
+        )
     else:
         st.caption("Point to your own CapitalIQ CSV + Factor XLSX files.")
         capitaliq_path = st.text_input(
@@ -522,8 +542,13 @@ def _render_config_pane(config: Config) -> tuple[list[str], str, str, str, str, 
     st.markdown('<div class="fi-config-label">METHODOLOGY</div>', unsafe_allow_html=True)
     if source == "live":
         st.caption(
-            "Long-short (QSpread) return series from Fama-French. "
+            "Long-short factor return series from Fama-French. "
             "Not a raw quintile sort — see French Data Library documentation."
+        )
+    elif source == "compute":
+        st.caption(
+            "Quintile sort on S&P 500 · Equal-weight · 1M holding lag · "
+            "Winsorized 1/99% · 252-day rolling windows for Beta and Vol."
         )
     else:
         st.caption("Quintile sort · Equal-weight · 1M holding lag · Winsorized 1/99%")
@@ -558,7 +583,8 @@ def _render_config_pane(config: Config) -> tuple[list[str], str, str, str, str, 
 
     result: Optional[FactorInvestingResult] = st.session_state.get(_K_RESULT)
     if result is not None:
-        src_label = "Fama-French (live)" if result.source == "live" else result.source
+        _SRC_MAP = {"live": "Fama-French (live)", "computed": "S&P 500 daily compute", "precomputed": "CapitalIQ static"}
+    src_label = _SRC_MAP.get(result.source, result.source)
         st.caption(
             f"Source: {src_label}  ·  "
             f"As of: {result.as_of_date.strftime('%b %Y')}"
@@ -576,7 +602,8 @@ def _render_config_pane(config: Config) -> tuple[list[str], str, str, str, str, 
 # ── Tab renderers ──────────────────────────────────────────────────────────────
 
 def _render_overview(result: FactorInvestingResult) -> None:
-    src_label = "Fama-French (live)" if result.source == "live" else result.source
+    _SRC_MAP = {"live": "Fama-French (live)", "computed": "S&P 500 daily compute", "precomputed": "CapitalIQ static"}
+    src_label = _SRC_MAP.get(result.source, result.source)
     n = len(result.factor_stats)
     st.markdown(
         f'<div class="fi-results-bar">'
