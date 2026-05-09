@@ -1,0 +1,435 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   ui/styles/factor_investing.css
+   Factor Investing Workbench tab — Bloomberg-density research panel.
+   Mirrors the two-pane grid pattern from arimax_tab.css.
+   All colors via var(--*) from theme.py :root. Page-local hex only where
+   noted (#f7f5f9 = not-yet-tokenised config pane bg; amber chip values
+   use --fi-amber / --fi-amber-bg which are registered in :root).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. SCROLL BLEED GUARD ─────────────────────────────────────────────
+   Prevents scroll chaining when Factor Investing tab is hosted inside
+   the simple_aa or sim outer column. */
+div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker)
+        > div:nth-child(2):has(.fi-page-marker),
+div[data-testid="stHorizontalBlock"]:has(.sim-sb-marker)
+        > div:nth-child(2):has(.fi-page-marker) {
+    overscroll-behavior: contain !important;
+}
+
+/* ── 2. TWO-PANE GRID ROW ──────────────────────────────────────────────
+   Viewport-locked row height so the inner columns scroll independently.
+   Scoped to .st-key-fi_main_grid to avoid matching the outer page row. */
+.st-key-fi_main_grid > div[data-testid="stVerticalBlock"]
+        > div[data-testid="stHorizontalBlock"] {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+    height: calc(100vh - 100px) !important;
+    max-height: calc(100vh - 100px) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+/* ── 3. LEFT CONFIG COLUMN — fixed 260px ──────────────────────────────
+   Matches the ARIMAX config pane pin. Scrolls its own content. */
+.st-key-fi_main_grid > div[data-testid="stVerticalBlock"]
+        > div[data-testid="stHorizontalBlock"] > div:first-child {
+    flex: 0 0 260px !important;
+    width: 260px !important;
+    max-width: 260px !important;
+    min-width: 260px !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    display: block !important;
+}
+
+/* ── 4. RIGHT DISPLAY COLUMN — fills remaining space ──────────────────
+   min-width:0 prevents wide tables/charts from pushing past the viewport. */
+.st-key-fi_main_grid > div[data-testid="stVerticalBlock"]
+        > div[data-testid="stHorizontalBlock"] > div:nth-child(2) {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+}
+
+/* ── 5. CONFIG PANE VISUAL CONTAINER ──────────────────────────────────
+   #f7f5f9 = purple-tinted off-white; same as arx_config_pane bg.
+   Awaiting --config-pane-bg token in theme.py. */
+.st-key-fi_config_pane {
+    background: #f7f5f9 !important;
+    border: 1.5px solid #9c8fa9 !important;
+    padding: 10px 12px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    position: relative;
+    min-height: calc(100vh - 120px) !important;
+    box-sizing: border-box !important;
+}
+
+/* Force dark text inside the config pane */
+.st-key-fi_config_pane p,
+.st-key-fi_config_pane span:not([data-testid]),
+.st-key-fi_config_pane label,
+.st-key-fi_config_pane [data-testid="stMarkdownContainer"] *,
+.st-key-fi_config_pane [data-testid="stCaptionContainer"] p,
+.st-key-fi_config_pane [data-testid="stCheckbox"] span,
+.st-key-fi_config_pane input:not([type="range"]),
+.st-key-fi_config_pane [data-baseweb="select"] span {
+    color: var(--text) !important;
+}
+.st-key-fi_config_pane label,
+.st-key-fi_config_pane [data-testid="stCaptionContainer"] p {
+    color: var(--text-secondary) !important;
+}
+.st-key-fi_config_pane input:not([type="range"]),
+.st-key-fi_config_pane [data-baseweb="select"] {
+    background: var(--bg) !important;
+}
+
+/* ── 6. CONFIG PANE SCROLLBAR ──────────────────────────────────────────
+   Matches arimax_tab.css left-column scrollbar aesthetic. */
+.st-key-fi_main_grid > div[data-testid="stVerticalBlock"]
+        > div[data-testid="stHorizontalBlock"]
+        > div:first-child::-webkit-scrollbar { width: 8px; }
+.st-key-fi_main_grid > div[data-testid="stVerticalBlock"]
+        > div[data-testid="stHorizontalBlock"]
+        > div:first-child::-webkit-scrollbar-thumb {
+    background: #c9b8d4;
+    border-radius: 4px;
+}
+.st-key-fi_main_grid > div[data-testid="stVerticalBlock"]
+        > div[data-testid="stHorizontalBlock"]
+        > div:first-child::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* ── 7. CONFIG PANE SECTION SEPARATORS ────────────────────────────────
+   .fi-config-sep = visual divider between config blocks. 8px grid. */
+.fi-config-sep {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0 8px;
+    opacity: 0.7;
+}
+
+/* Section label above each config block — 9px uppercase, muted text. */
+.fi-config-label {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    margin: 0 0 4px;
+    padding: 0;
+}
+
+/* ── 8. FACTOR CHECKBOX LIST — tighter spacing ─────────────────────────
+   Compress default gap so 7-10 factor checkboxes fit without scrolling. */
+.st-key-fi_config_pane [data-testid="stCheckbox"] {
+    margin-bottom: 4px !important;
+}
+.st-key-fi_config_pane [data-testid="stCheckbox"] label {
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    color: var(--text) !important;
+    gap: 6px !important;
+}
+
+/* ── 9. "RUN ANALYSIS" PRIMARY BUTTON ─────────────────────────────────
+   Full-width, 36px, Tsinghua Purple fill. Scoped to fi_run_btn key. */
+.st-key-fi_run_btn button {
+    width: 100% !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    background: var(--theme-purple) !important;
+    color: var(--bg) !important;
+    border: none !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.04em !important;
+    border-radius: 2px !important;
+    margin-top: 16px !important;
+}
+.st-key-fi_run_btn button:hover {
+    background: #8a0a9e !important;
+}
+
+/* ── 10. SUB-TAB NAVIGATION ────────────────────────────────────────────
+   Compact 32px height; suppresses default lavender background. */
+.st-key-fi_subtabs [data-testid="stTabs"] > div:first-child {
+    background: var(--bg) !important;
+    border-bottom: 1px solid var(--border) !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+}
+.st-key-fi_subtabs button[role="tab"] {
+    height: 32px !important;
+    min-height: 32px !important;
+    font-size: 10px !important;
+    padding: 0 16px !important;
+}
+
+/* ── 11. FACTOR STATISTICS TABLE ───────────────────────────────────────
+   8-column professional data table. Dense rows (4px v-padding).
+   Monospace numerics via font-variant-numeric: tabular-nums. */
+.fi-stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    font-family: Inter, sans-serif;
+    margin-top: 8px;
+}
+.fi-stats-table th {
+    background: #f8f4fa;
+    color: var(--text-mute);
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 4px 8px;
+    text-align: right;
+    border-bottom: 2px solid var(--theme-purple-light);
+    white-space: nowrap;
+}
+.fi-stats-table th:first-child {
+    text-align: left;
+    min-width: 120px;
+}
+.fi-stats-table th.col-n { width: 40px; }
+.fi-stats-table th.col-sig { width: 72px; text-align: center; }
+.fi-stats-table td {
+    padding: 4px 8px;
+    border-bottom: 1px solid #f0e8f5;
+    vertical-align: middle;
+    text-align: right;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    white-space: nowrap;
+}
+.fi-stats-table td:first-child {
+    text-align: left;
+    font-family: Inter, sans-serif;
+    font-weight: 600;
+    color: var(--text);
+}
+.fi-stats-table td.col-sig { text-align: center; }
+.fi-stats-table tr:last-child td { border-bottom: none; }
+.fi-stats-table tr:hover td { background: rgba(102, 8, 116, 0.04); }
+
+/* ── 11a. SHARPE CONDITIONAL FORMATTING ────────────────────────────────
+   Python assigns the class; CSS owns the color — no hex in .py files. */
+.fi-sharpe-good { color: var(--gain) !important; font-weight: 600; }
+.fi-sharpe-mid  { color: var(--fi-amber) !important; font-weight: 600; }
+.fi-sharpe-low  { color: var(--text-mute) !important; font-weight: 400; }
+
+/* ── 12. SIGNIFICANCE CHIPS ─────────────────────────────────────────────
+   Inline pills for QSpread t-test significance. */
+.fi-sig-chip {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    padding: 1px 6px;
+    border-radius: 3px;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+/* *** p<0.01 — gain green */
+.fi-sig-strong { background: var(--gain); color: var(--bg); }
+/* ** p<0.05 — amber (uses registered --fi-amber / --fi-amber-bg tokens) */
+.fi-sig-med    { background: var(--fi-amber-bg); color: var(--fi-amber); }
+/* * p<0.10 — light purple tint */
+.fi-sig-weak   { background: rgba(192, 132, 252, 0.18); color: var(--theme-purple); }
+
+/* ── 13. CORRELATION HEATMAP WRAPPER ───────────────────────────────────
+   Contains a Plotly figure; overflow:hidden prevents iframe bleed. */
+.st-key-fi_corr_heatmap {
+    overflow: hidden !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 2px !important;
+}
+.st-key-fi_corr_heatmap [data-testid="stPlotlyChart"] {
+    width: 100% !important;
+}
+
+/* ── 14. SCORE MY PORTFOLIO TABLE ──────────────────────────────────────
+   Same density pattern as fi-stats-table. */
+.fi-score-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    font-family: Inter, sans-serif;
+    margin-top: 8px;
+}
+.fi-score-table th {
+    background: #f8f4fa;
+    color: var(--text-mute);
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 4px 8px;
+    text-align: right;
+    border-bottom: 2px solid var(--theme-purple-light);
+    white-space: nowrap;
+}
+.fi-score-table th:first-child,
+.fi-score-table th.col-ticker { text-align: left; }
+.fi-score-table td {
+    padding: 4px 8px;
+    border-bottom: 1px solid #f0e8f5;
+    vertical-align: middle;
+    text-align: right;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    white-space: nowrap;
+}
+.fi-score-table td:first-child { color: var(--text-mute); font-weight: 400; }
+.fi-score-table td.col-ticker {
+    text-align: left;
+    font-family: Inter, sans-serif;
+    font-weight: 600;
+    color: var(--text);
+}
+.fi-score-table tr:last-child td { border-bottom: none; }
+.fi-score-table tr:hover td { background: rgba(102, 8, 116, 0.04); }
+
+/* ── 14a. COMPOSITE SCORE BAR CELL ─────────────────────────────────────
+   Flex row: numeric label + 48px bounded bar track. */
+.fi-score-cell {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+}
+.fi-score-num {
+    min-width: 40px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+.fi-score-bar-track {
+    width: 48px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.fi-score-bar-fill {
+    height: 100%;
+    border-radius: 1px;
+    min-width: 2px;
+}
+.fi-score-bar-pos { background: var(--gain); }
+.fi-score-bar-neg { background: var(--loss); }
+
+/* Decile badge — tiny numbered pill */
+.fi-decile-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    min-width: 20px;
+    text-align: center;
+    padding: 1px 4px;
+    border-radius: 2px;
+    background: #f8f4fa;
+    color: var(--theme-purple);
+    border: 1px solid var(--theme-purple-light);
+}
+
+/* ── 15. BRIDGE ACTION BUTTONS ─────────────────────────────────────────
+   Outlined secondary buttons side-by-side in .fi-bridge-row. */
+.fi-bridge-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+.st-key-fi_push_step2 button,
+.st-key-fi_push_tilt button {
+    flex: 1 !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.04em !important;
+    border-radius: 2px !important;
+    background: var(--bg) !important;
+    color: var(--theme-purple) !important;
+    border: 1.5px solid var(--theme-purple) !important;
+    text-transform: uppercase !important;
+}
+.st-key-fi_push_step2 button:hover,
+.st-key-fi_push_tilt button:hover {
+    background: var(--theme-purple) !important;
+    color: var(--bg) !important;
+}
+
+/* ── 16. "FACTOR INPUTS ACTIVE" BADGE ─────────────────────────────────
+   Small pill injected into Simple AA sidebar when factor tilt is active. */
+.fi-active-badge {
+    display: inline-block;
+    background: var(--theme-purple);
+    color: var(--bg);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+}
+
+/* ── 17. EMPTY STATE ───────────────────────────────────────────────────
+   Shown in the right pane before the first analysis run. */
+.fi-empty {
+    text-align: center;
+    color: var(--text-mute);
+    padding: 48px 32px;
+}
+.fi-empty h3 {
+    color: var(--theme-purple);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.fi-empty p {
+    font-size: 11px;
+    line-height: 1.7;
+    max-width: 480px;
+    margin: 0 auto;
+    color: var(--text-secondary);
+}
+
+/* ── 18. SECTION HEADER STRIP ─────────────────────────────────────────
+   Purple bar across the full width — mirrors .arx-results-bar. */
+.fi-results-bar {
+    background: var(--theme-purple);
+    color: var(--bg);
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    letter-spacing: 0.3px;
+    border-bottom: 2px solid var(--theme-purple-light);
+    margin-bottom: 8px;
+}
+.fi-results-count {
+    font-weight: 400;
+    font-size: 10px;
+    color: #d4b8e0;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+}

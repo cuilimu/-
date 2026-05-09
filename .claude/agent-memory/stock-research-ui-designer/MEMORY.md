@@ -1,0 +1,4 @@
+- [Page 1 Universe — Design Decisions & Locked Patterns](project_page1_universe.md) — Layout constants, token usage, violations found in 2026-05-09 audit of Stock Selection page
+- [Econometrics Console — Design Spec Decisions](project_econometrics_console.md) — Proposal A WITHDRAWN; LR stays in Step 5; cross-reference bridge approved instead
+- [Allocation Sub-Router — Design Spec Decisions](project_allocation_subrouter.md) — Proposal B: strategy selector placement, sub-router file structure, shared context, empty states
+- [Workflow Taxonomy — Corrected Step Definitions](project_workflow_taxonomy.md) — Locked 8-step order: SAA at Step 3, TAA at Step 4 (not inverted); LR at Step 5; TAA Scenarios at Step 7; ARIMAX at Step 8

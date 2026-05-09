@@ -1,0 +1,10 @@
+project_id = "zqbwvfkfmkqkelohaqew"
+
+[functions.stats-guide]
+verify_jwt = false
+
+[functions.generate-report]
+verify_jwt = false
+
+[functions.infer-variable-dictionary]
+verify_jwt = false

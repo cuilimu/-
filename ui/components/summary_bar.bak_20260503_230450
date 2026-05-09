@@ -1,0 +1,43 @@
+"""
+ui/components/summary_bar.py — Aggregate summary bar (Fix 9: light purple bg, purple border).
+Fix 1: HTML built without f-string quote collisions.
+"""
+
+import streamlit as st
+from stock_engine.backtest.base import BacktestResult
+from stock_engine.ui.theme import COLOR_GAIN, COLOR_LOSS
+
+
+def summary_bar(group_results: dict[str, BacktestResult]) -> None:
+    if not group_results:
+        return
+
+    total_deployed = 0.0
+    total_current = 0.0
+    for result in group_results.values():
+        total_deployed += result.initial_capital
+        if result.snapshots:
+            total_current += result.snapshots[-1].nav
+
+    pnl = total_current - total_deployed
+    pnl_pct = (pnl / total_deployed * 100) if total_deployed > 0 else 0.0
+    pnl_color = COLOR_GAIN if pnl >= 0 else COLOR_LOSS
+    sign = "+" if pnl >= 0 else ""
+
+    # Fix 1: build HTML string without mixing quote styles inside f-string
+    pnl_html = (
+        '<span style="color:' + pnl_color + ';font-weight:600">'
+        + sign + "$" + f"{pnl:,.0f}"
+        + " (" + sign + f"{pnl_pct:.1f}" + "%)"
+        + "</span>"
+    )
+    html = (
+        '<div class="summary-bar">'
+        "<span><strong>Total Deployed:</strong> $" + f"{total_deployed:,.0f}" + "</span>"
+        "<span><strong>Total Value:</strong> $" + f"{total_current:,.0f}" + "</span>"
+        "<span><strong>Overall P&amp;L:</strong> " + pnl_html + "</span>"
+        "</div>"
+    )
+    st.markdown(html, unsafe_allow_html=True)
+
+

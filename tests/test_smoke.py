@@ -1,0 +1,89 @@
+"""
+Smoke tests — verify the module graph is importable and interfaces are wired.
+No business logic tested here; that comes with implementations.
+Run with: pytest tests/test_smoke.py -v
+"""
+
+import pytest
+
+
+def test_config_importable():
+    from stock_engine.config import Config
+    c = Config()
+    assert c.initial_capital == 100_000.0
+    assert c.default_benchmark == "SPY"
+
+
+def test_exceptions_importable():
+    from stock_engine.exceptions import (
+        AnalyticsError,
+        BacktestError,
+        DataError,
+        EngineError,
+        PortfolioError,
+        VisualizationError,
+    )
+    assert issubclass(DataError, EngineError)
+    assert issubclass(PortfolioError, EngineError)
+    assert issubclass(BacktestError, EngineError)
+
+
+def test_data_interfaces_importable():
+    from stock_engine.data import DataProvider, YFinanceProvider
+    # DataProvider is abstract — cannot instantiate
+    with pytest.raises(TypeError):
+        DataProvider()  # type: ignore[abstract]
+
+
+def test_portfolio_models_importable():
+    from datetime import datetime
+    from stock_engine.portfolio.models import Position, PortfolioSnapshot, Transaction
+
+    pos = Position(ticker="AAPL", quantity=10.0, cost_basis=150.0)
+    assert pos.total_cost == 1500.0
+
+
+def test_portfolio_importable():
+    from stock_engine.config import Config
+    from stock_engine.portfolio import Portfolio
+    p = Portfolio(Config())
+    assert p.cash == 100_000.0
+    assert p.positions == {}
+
+
+def test_backtest_interfaces_importable():
+    from stock_engine.backtest import BacktestResult, Strategy
+    with pytest.raises(TypeError):
+        Strategy()  # type: ignore[abstract]
+
+
+def test_analytics_importable():
+    from stock_engine.analytics import AnalyticsEngine, PerformanceMetrics
+    from stock_engine.config import Config
+    engine = AnalyticsEngine(Config())
+    assert engine is not None
+
+
+def test_viz_importable():
+    from stock_engine.viz import DEFAULT_THEME, VizTheme
+    from stock_engine.ui.theme import COLOR_GAIN
+    assert DEFAULT_THEME.color_gain == COLOR_GAIN
+
+
+def test_ui_theme_importable():
+    from stock_engine.ui.theme import COLOR_GAIN, COLOR_LOSS, CUSTOM_CSS
+    assert COLOR_GAIN.startswith("#") and len(COLOR_GAIN) == 7
+    assert COLOR_LOSS.startswith("#") and len(COLOR_LOSS) == 7
+    assert "<style>" in CUSTOM_CSS
+
+
+def test_ui_components_importable():
+    # Only check import — Streamlit widgets can't run outside st context
+    from stock_engine.ui.components import (
+        capital_input,
+        date_range_picker,
+        portfolio_summary_card,
+        positions_table,
+        ticker_selector,
+        transaction_history_table,
+    )

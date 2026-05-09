@@ -1,0 +1,301 @@
+/*
+ * home.css — Extracted from ui/components/home.py HOME_CSS f-string.
+ * Theme tokens resolved at extraction time:
+ *   SIDEBAR_BG                  = var(--theme-purple)
+ *   SIDEBAR_BG_DARK             = #4a0554
+ *   SECTION_HEADER              = var(--theme-purple)
+ *   MAIN_TEXT                   = var(--text)
+ *   MAIN_TEXT_SECONDARY         = var(--text-secondary)
+ *   HOME_PAGE_LABEL_COLOR       = var(--text-mute)
+ *   HOME_FOCAL_CARD_BG          = #f8f4fa  (= CARD_BG_PURPLE)
+ *   HOME_FOCAL_CARD_BORDER      = var(--theme-purple)  (= SECTION_HEADER)
+ *   HOME_SEGMENT_BG             = #f5f0f8
+ *   HOME_SEGMENT_ACTIVE_BG      = var(--theme-purple)  (= SECTION_HEADER)
+ *   HOME_SEGMENT_ACTIVE_TEXT    = var(--bg)
+ *   HOME_SEGMENT_INACTIVE_TEXT  = var(--text-secondary)
+ *   HOME_DIVIDER_HAIRLINE       = #eee5f0
+ */
+
+/* ── Reset Streamlit chrome ─────────────────────────────────────────────── */
+header[data-testid='stHeader']   { display: none !important; }
+footer { display: none !important; }
+#MainMenu { display: none !important; }
+
+.block-container {
+    padding-top: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: 100% !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LEFT SIDEBAR COLUMN — scoped via :has(.home-sidebar-marker).
+───────────────────────────────────────────────────────────────────────────── */
+div[data-testid="stHorizontalBlock"]:has(.home-sidebar-marker)
+  > div:first-child {
+    background-color: var(--theme-purple) !important;
+    min-height: 100vh !important;
+    padding: 16px 8px 24px !important;
+    border-radius: 0 !important;
+    display: flex; flex-direction: column;
+}
+div[data-testid="stHorizontalBlock"]:has(.home-sidebar-marker)
+  > div:first-child * { box-sizing: border-box; }
+
+.sb-logo-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 4px;
+}
+.sb-brand-title  { font-size: 12px; font-weight: 600; color: var(--bg); line-height: 1.3; }
+.sb-brand-sub    { font-size: 9px; color: rgba(255,255,255,0.5);
+                    letter-spacing: 0.1em; text-transform: uppercase; }
+.sb-divider      { height: 1px; background: rgba(255,255,255,0.14); margin: 8px 0; }
+.sb-section      { font-size: 9px; color: rgba(255,255,255,0.5);
+                    letter-spacing: 0.1em; text-transform: uppercase;
+                    margin: 16px 0 4px 4px; }
+.sb-item         { font-size: 11px; color: rgba(255,255,255,0.65);
+                    padding: 4px 8px; border-radius: 4px; cursor: default; }
+.sb-item.active  { background: rgba(255,255,255,0.14); color: var(--bg); }
+.sb-item:not(.active):hover { background: rgba(255,255,255,0.07); }
+.sb-spacer       { flex: 1; }
+.sb-build-tag    { font-size: 9px; color: rgba(255,255,255,0.4);
+                    letter-spacing: 0.1em; text-transform: uppercase;
+                    padding: 4px 8px; }
+
+/* ── Sidebar navigation buttons (Home + Saved Portfolios pages) ──────────
+   Style Streamlit buttons inside the sidebar column to match .sb-item.
+   Scoped by .home-sidebar-marker so these rules don't bleed elsewhere.    */
+div[data-testid="stHorizontalBlock"]:has(.home-sidebar-marker)
+  > div:first-child [data-testid="stButton"] button {
+    font-size: 11px !important;
+    color: rgba(255,255,255,0.7) !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 4px !important;
+    padding: 4px 8px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    line-height: 1.4 !important;
+    text-align: left !important;
+    width: 100% !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.home-sidebar-marker)
+  > div:first-child [data-testid="stButton"] button:hover {
+    background: rgba(255,255,255,0.09) !important;
+    color: var(--bg) !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.home-sidebar-marker)
+  > div:first-child [data-testid="stButton"] { margin: 0 !important; padding: 0 !important; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MAIN CONTENT COLUMN
+───────────────────────────────────────────────────────────────────────────── */
+
+.home-main-pad {
+    padding: 16px 24px 24px;
+    max-width: 680px;   /* entry-screen comfort: focal card centered, intentional right gutter */
+}
+
+/* Page label row — eyebrow + meta */
+.home-eyebrow-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin: 0 0 4px;
+}
+.home-eyebrow {
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-mute); font-weight: 600;
+}
+.home-build-pill {
+    font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--theme-purple); background: #f8f4fa;
+    border: 1px solid #eee5f0;
+    border-radius: 8px; padding: 2px 8px;
+    font-weight: 600;
+}
+.home-meta {
+    font-size: 11px; color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+    margin: 0 0 16px;
+}
+.home-meta .meta-sep { color: #eee5f0; margin: 0 8px; }
+
+/* Hairline divider between header and selectors */
+.home-hairline {
+    height: 1px; background: #eee5f0;
+    margin: 0 0 16px;
+}
+
+/* Section labels above segmented controls */
+.home-sec-label {
+    font-size: 10px; color: var(--text-mute);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin: 0 0 8px !important; font-weight: 600;
+}
+
+/* ── Segmented controls — scoped by widget-key class ─────────────────────
+   Streamlit (1.56) emits the wrapping element with class .st-key-<widget_key>
+   so we target by key. The button-group container is [data-testid="stButtonGroup"];
+   buttons carry kind="segmented_control" (inactive) or "segmented_controlActive". */
+.st-key-home_scope_seg [data-testid="stButtonGroup"],
+.st-key-home_exec_seg [data-testid="stButtonGroup"] {
+    background: #f5f0f8 !important;
+    border-radius: 6px !important;
+    padding: 2px !important;
+    gap: 0 !important;
+}
+/* Hide the always-rendered widget label — label_visibility="collapsed" on
+   segmented_control still leaves the label DOM behind, taking vertical space. */
+.st-key-home_scope_seg [data-testid="stWidgetLabel"],
+.st-key-home_exec_seg [data-testid="stWidgetLabel"] {
+    display: none !important;
+}
+.st-key-home_scope_seg [data-testid="stButtonGroup"] button,
+.st-key-home_exec_seg  [data-testid="stButtonGroup"] button {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 4px 16px !important;
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    color: var(--text-secondary) !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 4px !important;
+    letter-spacing: 0.02em !important;
+    transition: background 0.1s ease, color 0.1s ease !important;
+}
+.st-key-home_scope_seg button[data-testid="stBaseButton-segmented_controlActive"],
+.st-key-home_exec_seg  button[data-testid="stBaseButton-segmented_controlActive"] {
+    background: var(--theme-purple) !important;
+    color: var(--bg) !important;
+    font-weight: 600 !important;
+}
+.st-key-home_scope_seg button[data-testid="stBaseButton-segmented_control"]:hover,
+.st-key-home_exec_seg  button[data-testid="stBaseButton-segmented_control"]:hover {
+    color: var(--text) !important;
+}
+.home-seg-spacer { height: 16px; }
+
+/* ── Focal area: Selected Workflow card ────────────────────────────────── */
+.home-focal {
+    background: #f8f4fa;
+    border: 1px solid var(--theme-purple);
+    border-radius: 4px;
+    padding: 16px;
+    margin: 16px 0 16px;
+}
+.home-focal-eyebrow {
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--theme-purple); font-weight: 600;
+    margin: 0 0 8px;
+}
+.home-focal-title {
+    font-size: 16px; font-weight: 600; color: var(--text);
+    margin: 0 0 8px; line-height: 1.3;
+}
+.home-focal-summary {
+    font-size: 12px; color: var(--text-secondary); line-height: 1.5;
+    margin: 0 0 8px;
+}
+.home-focal-bullets {
+    list-style: none; padding: 0; margin: 0 0 16px;
+}
+.home-focal-bullets li {
+    font-size: 12px; color: var(--text); line-height: 1.5;
+    padding: 4px 0 4px 16px; position: relative;
+}
+.home-focal-bullets li::before {
+    content: "·"; color: var(--theme-purple); font-weight: 600;
+    position: absolute; left: 4px; top: 4px;
+}
+.home-focal-recommend {
+    display: inline-block;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--theme-purple); font-weight: 600;
+    background: rgba(102,8,116,0.08);
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: 0 0 16px;
+}
+
+/* CTA — visually anchored to the focal card. Pulled up via negative margin
+   so the gap reads as "attached to the card" rather than "loose button below".
+   Right-aligned with a flex wrapper. theme.py's [data-testid="stMain"] .stButton
+   selector outranks bare .st-key on specificity, so we prefix accordingly. */
+[data-testid="stMain"] .st-key-home_start_btn {
+    width: 100% !important;
+    margin-top: -8px !important;
+    margin-bottom: 8px !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+/* The inner [data-testid="stButton"] wrapper otherwise stretches to full
+   width and defeats the parent flex justify-end. Constrain it to content. */
+[data-testid="stMain"] .st-key-home_start_btn [data-testid="stButton"] {
+    width: auto !important;
+    flex: 0 0 auto !important;
+}
+[data-testid="stMain"] .st-key-home_start_btn button {
+    background: var(--theme-purple) !important;
+    color: var(--bg) !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 8px 24px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.04em !important;
+    width: auto !important;
+}
+[data-testid="stMain"] .st-key-home_start_btn button:hover {
+    background: #4a0554 !important;
+}
+
+/* API expander — quiet styling so it doesn't compete with focal */
+div[data-testid="stMain"] [data-testid="stExpander"] {
+    margin-top: 16px;
+    border: 1px solid #eee5f0 !important;
+    border-radius: 4px !important;
+    background: transparent !important;
+}
+div[data-testid="stMain"] [data-testid="stExpander"] summary {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: var(--text-secondary) !important;
+    background: transparent !important;
+    padding: 8px 16px !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+}
+div[data-testid="stMain"] [data-testid="stExpander"] summary:hover {
+    background: #f8f4fa !important;
+    color: var(--theme-purple) !important;
+}
+
+/* ── API key cards (preserved from original — only call-site moved) ──── */
+.api-cfg-card {
+    background: #fafafc;
+    border: 1px solid #eee5f0;
+    border-left: 2px solid var(--theme-purple);
+    border-radius: 4px;
+    padding: 8px 16px;
+    margin-bottom: 8px;
+}
+.api-cfg-row1 {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 4px;
+}
+.api-cfg-name { font-size: 12px; font-weight: 600; color: var(--text);
+                 letter-spacing: 0.02em; }
+.api-cfg-status {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+}
+.api-cfg-status.ok    { color: var(--gain); }
+.api-cfg-status.bad   { color: var(--loss); }
+.api-cfg-status.idle  { color: #999; }
+.api-cfg-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5;
+                 margin-bottom: 8px; }
+.api-cfg-link { color: var(--theme-purple); font-weight: 600; }
+.api-cfg-link:hover { text-decoration: underline; }

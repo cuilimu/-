@@ -1,0 +1,127 @@
+/* ── Floating dropdown — position:fixed, fully out of document flow ── */
+.ts-wrap {
+    position: fixed;
+    z-index: 9999;
+    border: 1px solid #d0d0d0;
+    border-radius: 0;
+    overflow: hidden;
+    background: var(--bg);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    /* Fallback position; JS sets precise top/left/width on every render */
+    top: 120px;
+    left: 10px;
+    min-width: 280px;
+    max-width: 640px;
+}
+
+/* ── Info cell ── */
+.ts-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    min-height: 36px;
+    background: var(--bg);
+}
+.ts-info:hover  { background: #f5edfb; }
+.ts-info-last   { border-bottom: none; }
+
+.ts-symbol {
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text);
+    min-width: 56px;
+    letter-spacing: 0.2px;
+    font-family: monospace;
+}
+.ts-name {
+    flex: 1;
+    font-size: 12px;
+    color: #555555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ts-type {
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 2px;
+    padding: 1px 5px;
+    white-space: nowrap;
+}
+.ts-exch {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-mute);
+    background: #f0f0f0;
+    border-radius: 2px;
+    padding: 1px 5px;
+    white-space: nowrap;
+}
+.ts-added {
+    font-size: 11px;
+    color: #16a34a;
+    font-weight: 600;
+}
+
+/* ── Button cell ── */
+.ts-btn-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 6px;
+    border-bottom: 1px solid #f0f0f0;
+    min-height: 36px;
+    background: var(--bg);
+}
+.ts-btn-cell-last { border-bottom: none; }
+
+/* ── + button ── */
+div.ts-addbtn > div[data-testid="stButton"] > button {
+    background: var(--theme-purple) !important;
+    color: var(--bg) !important;
+    border: none !important;
+    border-radius: 2px !important;
+    padding: 0 10px !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    height: 24px !important;
+    min-height: 24px !important;
+    line-height: 24px !important;
+    box-shadow: none !important;
+    width: 100% !important;
+}
+div.ts-addbtn > div[data-testid="stButton"] > button:hover {
+    background: #8a0a9e !important;
+}
+
+/* ── Close link — min 24x24 clickable area ── */
+div.ts-close > div[data-testid="stButton"] > button {
+    background: none !important;
+    border: none !important;
+    color: #aaaaaa !important;
+    font-size: 11px !important;
+    padding: 4px 8px !important;
+    min-height: 24px !important;
+    min-width: 24px !important;
+    box-shadow: none !important;
+}
+div.ts-close > div[data-testid="stButton"] > button:hover {
+    color: var(--theme-purple) !important;
+    background: none !important;
+}
+
+/* Tighten Streamlit column gap inside dropdown rows */
+.ts-row-block [data-testid="stHorizontalBlock"] {
+    gap: 0 !important;
+}
+
+/* Anchor sentinel — zero-size; JS uses this to locate the search zone */
+.ts-anchor {
+    display: block;
+    height: 0;
+    overflow: hidden;
+    font-size: 0;
+    line-height: 0;
+}

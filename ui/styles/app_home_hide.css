@@ -1,0 +1,4 @@
+section[data-testid='stSidebar'] { display: none !important; }
+header[data-testid='stHeader'] { display: none !important; }
+footer { display: none !important; }
+#MainMenu { display: none !important; }

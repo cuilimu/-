@@ -1,0 +1,99 @@
+/* page1_news.css — styles for the Step-1 News tab (AI weekly digest).
+   Class prefix `p1-news-` / `p1-digest-` keeps these scoped to this page. */
+
+/* Toolbar above the digest */
+.p1-news-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0 6px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 14px;
+    box-sizing: border-box;
+}
+.p1-news-title {
+    font-size: 11px; color: var(--text);
+    letter-spacing: .14em; text-transform: uppercase; font-weight: 700;
+}
+.p1-news-window-info {
+    font-size: 9px; color: var(--text-mute);
+    letter-spacing: .08em; text-transform: uppercase; font-weight: 600;
+}
+
+/* Digest body — give markdown some breathing room */
+.p1-digest-wrap {
+    background: #fafafc;
+    border: 1px solid #eee5f0;
+    border-left: 3px solid var(--theme-purple);
+    padding: 18px 22px;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text);
+}
+.p1-digest-wrap h1, .p1-digest-wrap h2, .p1-digest-wrap h3 {
+    color: var(--theme-purple);
+    margin-top: 18px; margin-bottom: 8px;
+    letter-spacing: .02em;
+}
+.p1-digest-wrap h2 {
+    font-size: 14px;
+    border-bottom: 1px solid #eee5f0;
+    padding-bottom: 4px;
+}
+.p1-digest-wrap h3 { font-size: 12.5px; }
+.p1-digest-wrap ul, .p1-digest-wrap ol {
+    margin: 6px 0 10px 0;
+    padding-left: 22px;
+}
+.p1-digest-wrap li { margin: 3px 0; }
+.p1-digest-wrap strong { color: var(--theme-purple); }
+.p1-digest-wrap a {
+    color: var(--theme-purple); text-decoration: none;
+    border-bottom: 1px dotted #c8a0d8;
+}
+.p1-digest-wrap a:hover { border-bottom-style: solid; }
+.p1-digest-wrap blockquote {
+    border-left: 2px solid #c8a0d8;
+    margin: 8px 0; padding: 2px 12px;
+    color: #555;
+}
+
+.p1-digest-meta {
+    margin-top: 10px;
+    font-size: 9px; color: #aaaaaa;
+    letter-spacing: .04em;
+    font-style: italic;
+}
+
+/* Empty / error state */
+.p1-news-empty-wrap {
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 24px 16px;
+}
+.p1-news-empty-card {
+    background: #fafafc;
+    border-left: 2px solid var(--theme-purple);
+    border-radius: 4px;
+    padding: 12px 18px;
+    max-width: 520px; width: 100%;
+}
+.p1-news-empty-title {
+    font-size: 11px; font-weight: 600; color: var(--text);
+    margin-bottom: 4px;
+}
+.p1-news-empty-body {
+    font-size: 11px; color: var(--text-secondary); line-height: 1.55; margin: 0;
+}
+.p1-news-empty-body a {
+    color: var(--theme-purple); font-weight: 600; text-decoration: none;
+}
+.p1-news-empty-body a:hover { text-decoration: underline; }
+.p1-news-error-text {
+    color: #c2410c;
+    font-size: 10px;
+    font-family: 'SF Mono','Consolas',monospace;
+}
+
+/* Raw-items expander */
+.st-key-p1_news_raw_table table {
+    font-size: 10px !important;
+}

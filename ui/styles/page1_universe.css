@@ -1,0 +1,424 @@
+/* ══════════════════════════════════════════════════════════════
+   Bloomberg Terminal — white bg, purple accent, no decoration.
+   All heights are hardcoded; nothing may expand the page.
+   ══════════════════════════════════════════════════════════════ */
+
+/* Section labels */
+.p1-sec {
+    font-size: 9px;
+    color: var(--text-mute);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+/* ── Ticker column header — dark purple, 5-col grid (# | ticker | name | bucket | del) ── */
+.p1-th {
+    display: grid;
+    grid-template-columns: 28px 80px 1fr 160px 40px;
+    padding: 0 4px 0 6px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 8px;
+    font-family: monospace;
+    color: var(--terminal-text);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    background: var(--theme-purple);
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TICKER LIST — Bloomberg dark terminal, Stata-style column grid.
+   Scoped via .st-key-p1_ticker_list (st.container key= API).
+   ══════════════════════════════════════════════════════════════ */
+
+/* Container wrapper — dark bg + outer border */
+.st-key-p1_ticker_list,
+.st-key-p1_ticker_list > div {
+    background-color: var(--terminal-bg) !important;
+    border: 1px solid var(--terminal-border) !important;
+    border-top: none !important;
+}
+
+/* Every stVerticalBlock / stColumn inside the container */
+.st-key-p1_ticker_list [data-testid="stVerticalBlock"],
+.st-key-p1_ticker_list [data-testid="stColumn"],
+.st-key-p1_ticker_list [data-testid="stVerticalBlockBorderWrapper"],
+.st-key-p1_ticker_list [class*="element-container"],
+.st-key-p1_ticker_list [data-testid="stElementContainer"] {
+    background-color: var(--terminal-bg) !important;
+    background: var(--terminal-bg) !important;
+}
+
+/* Row layout + dark bg + subtle row divider */
+.st-key-p1_ticker_list [data-testid="stHorizontalBlock"] {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    overflow: hidden !important;
+    background-color: var(--terminal-bg) !important;
+    border-bottom: 1px solid var(--terminal-sep) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    box-sizing: border-box !important;
+}
+.st-key-p1_ticker_list [data-testid="stHorizontalBlock"]:hover,
+.st-key-p1_ticker_list [data-testid="stHorizontalBlock"]:focus-within {
+    background-color: var(--terminal-hover) !important;
+}
+
+/* stColumn direct children of each row */
+.st-key-p1_ticker_list [data-testid="stHorizontalBlock"]
+  > [data-testid="stColumn"] {
+    background-color: var(--terminal-bg) !important;
+    background: var(--terminal-bg) !important;
+}
+.st-key-p1_ticker_list [data-testid="stHorizontalBlock"]:hover
+  > [data-testid="stColumn"],
+.st-key-p1_ticker_list [data-testid="stHorizontalBlock"]:focus-within
+  > [data-testid="stColumn"] {
+    background-color: var(--terminal-hover) !important;
+    background: var(--terminal-hover) !important;
+}
+
+/* Kill white on every inner div layer — belt + suspenders */
+.st-key-p1_ticker_list [data-testid="stHorizontalBlock"] * {
+    background-color: transparent !important;
+}
+/* But re-apply dark to stVerticalBlock (which is a direct row container) */
+.st-key-p1_ticker_list [data-testid="stHorizontalBlock"]
+  [data-testid="stVerticalBlock"] {
+    background-color: var(--terminal-bg) !important;
+}
+
+/* Column 1 — row number: 28px */
+.st-key-p1_ticker_list [data-testid="stHorizontalBlock"]
+  > [data-testid="stColumn"]:nth-child(1) {
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    flex: 0 0 28px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    border-right: 1px solid var(--terminal-sep) !important;
+}
+/* Column 2 — ticker symbol: 80px */
+.st-key-p1_ticker_list [data-testid="stHorizontalBlock"]
+  > [data-testid="stColumn"]:nth-child(2) {
+    width: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+    flex: 0 0 80px !important;
+    overflow: hidden !important;
+    border-right: 1px solid var(--terminal-sep) !important;
+}
+/* Column 3 — name: flexible */
+.st-key-p1_ticker_list [data-testid="stHorizontalBlock"]
+  > [data-testid="stColumn"]:nth-child(3) {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    border-right: 1px solid var(--terminal-sep) !important;
+}
+/* Column 4 — bucket selector: 160px */
+.st-key-p1_ticker_list [data-testid="stHorizontalBlock"]
+  > [data-testid="stColumn"]:nth-child(4) {
+    width: 160px !important;
+    min-width: 160px !important;
+    max-width: 160px !important;
+    flex: 0 0 160px !important;
+    overflow: hidden !important;
+    border-right: 1px solid var(--terminal-sep) !important;
+}
+/* Column 5 — delete: 40px */
+.st-key-p1_ticker_list [data-testid="stHorizontalBlock"]
+  > [data-testid="stColumn"]:nth-child(5) {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    flex: 0 0 40px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Selectbox — dark terminal style */
+.st-key-p1_ticker_list .stSelectbox {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+.st-key-p1_ticker_list .stSelectbox label {
+    display: none !important;
+}
+.st-key-p1_ticker_list .stSelectbox > div > div {
+    height: 28px !important;
+    min-height: 28px !important;
+    border-radius: 0 !important;
+    background: var(--terminal-input-bg) !important;
+    border: 1px solid var(--terminal-input-border) !important;
+    color: var(--terminal-dim) !important;
+    font-size: 10px !important;
+    padding: 0 6px !important;
+}
+
+/* Delete button — dark terminal style */
+.st-key-p1_ticker_list [data-testid="stButton"] button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: rgba(255,255,255,0.28) !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    width: 24px !important;
+    min-width: 24px !important;
+    padding: 0 !important;
+    font-size: 11px !important;
+    border-radius: 0 !important;
+    font-weight: 400 !important;
+    line-height: 1 !important;
+    font-family: monospace !important;
+    letter-spacing: 0 !important;
+}
+.st-key-p1_ticker_list [data-testid="stButton"] button:hover {
+    color: var(--theme-purple-light) !important;
+    background: var(--terminal-hover) !important;
+}
+
+/* ── Factor bucket rows ── */
+.p1-bucket-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    min-height: 34px;
+    max-height: 34px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+.p1-bucket-row:last-child { border-bottom: none; }
+.p1-bucket-bar {
+    width: 3px;
+    height: 16px;
+    flex-shrink: 0;
+}
+.p1-bucket-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: .04em;
+    min-width: 100px;
+    max-width: 100px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.p1-chip {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    margin: 1px 2px;
+    border: 1px solid;
+    font-family: monospace;
+    /* no border-radius */
+}
+.p1-empty-label { font-size: 10px; color: var(--text-mute); }
+
+/* ── Chart border ── */
+.p1-chart {
+    border: 1px solid var(--border);
+    background: var(--bg);
+}
+
+/* ── STATA-style outer frame around the correlation module ── */
+.st-key-p1_corr_mod {
+    border: 1px solid var(--border) !important;
+    background: var(--bg) !important;
+    padding: 8px !important;
+    box-shadow: none !important;
+}
+.st-key-p1_corr_mod .p1-sec {
+    margin-top: 2px;
+}
+
+/* ── Correlation lookback selector — compressed to 20px height ── */
+.p1-corr-lb-selector .stSelectbox label {
+    display: none !important;
+}
+.p1-corr-lb-selector .stSelectbox > div > div {
+    height: 20px !important;
+    min-height: 20px !important;
+    font-size: 9px !important;
+    padding: 0 4px !important;
+    border-radius: 0 !important;
+    background: var(--bg) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-mute) !important;
+}
+.p1-corr-lb-selector [data-testid="stSelectbox"] {
+    margin-bottom: 0 !important;
+}
+
+/* ── No page-level horizontal overflow ── */
+section[data-testid="stMain"] > div[data-testid="stMainBlockContainer"] {
+    overflow-x: hidden !important;
+}
+
+/* ── Ticker row inline element classes (dark terminal zone) ── */
+.p1-row-num {
+    font-size: 9px;
+    color: var(--terminal-dim);
+    height: 36px;
+    line-height: 36px;
+    padding-left: 8px;
+    font-variant-numeric: tabular-nums;
+}
+.p1-row-sym-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 36px;
+    padding-left: 4px;
+    overflow: hidden;
+}
+.p1-row-sym {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--terminal-text);
+    font-family: monospace;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+.p1-row-name {
+    font-size: 10px;
+    color: var(--terminal-name-dim);
+    height: 36px;
+    line-height: 36px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 8px;
+}
+.p1-row-empty-name {
+    color: var(--text-mute);
+    font-style: italic;
+}
+
+/* ── Empty placeholder row (10-row fixed list) ── */
+.p1-empty-row {
+    height: 36px;
+    border-bottom: 1px solid var(--terminal-sep);
+    background: var(--terminal-bg);
+    box-sizing: border-box;
+}
+
+/* ── Spacer utilities ── */
+.p1-spacer-sm { height: 8px; }
+
+/* ── Stata-style correlation placeholder ── */
+.p1-corr-ph {
+    height: 100%;
+    background: var(--bg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+}
+.p1-corr-ph-bar {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 4px 8px;
+    font-size: 9px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Segoe UI', sans-serif;
+    letter-spacing: 0.05em;
+}
+.p1-corr-ph-bar-idle {
+    color: var(--text-mute);
+    font-size: 8px;
+    letter-spacing: 0.05em;
+}
+.p1-corr-ph-body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 132px;
+    overflow: hidden;
+}
+.p1-corr-ph-log {
+    padding: 8px 16px;
+    background: var(--bg);
+    border-right: 1px solid var(--border);
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 10px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+.p1-corr-ph-log-prompt  { color: var(--theme-purple); }
+.p1-corr-ph-log-pending { color: var(--text-mute); font-style: italic; }
+.p1-corr-ph-log-key     { color: var(--text-mute); }
+.p1-corr-ph-log-val     { color: var(--text); font-weight: 600; }
+.p1-corr-ph-log-gap     { height: 8px; }
+.p1-corr-ph-props {
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+}
+.p1-corr-ph-props-hdr {
+    background: var(--theme-purple);
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-family: 'Segoe UI', sans-serif;
+}
+.p1-corr-ph-props-body {
+    padding: 8px;
+    font-size: 9px;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: 'Segoe UI', sans-serif;
+}
+.p1-corr-ph-prop-key {
+    color: var(--text-mute);
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+.p1-corr-ph-prop-val {
+    color: var(--text);
+    font-weight: 600;
+}
+
+/* ── Bottom status bar ── */
+.p1-summary-bar {
+    font-size: 10px;
+    color: var(--text-mute);
+    letter-spacing: 0.04em;
+    padding: 4px 0;
+    font-variant-numeric: tabular-nums;
+}

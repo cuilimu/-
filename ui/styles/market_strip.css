@@ -1,0 +1,83 @@
+.market-ticker-bar {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    padding: 8px 0;
+    margin: 0 0 16px;
+    border-bottom: 1px solid #eee5f0;
+}
+.market-ticker-bar .mt-card {
+    flex: 1 1 0;
+    min-width: 0;
+    background: #faf8fc;
+    border: 1px solid #ece2f1;
+    border-left: 2px solid #d8c4e6;
+    border-radius: 4px;
+    padding: 8px;
+}
+.market-ticker-bar .mt-row-top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    line-height: 1.15;
+}
+.market-ticker-bar .mt-symbol {
+    font-size: 10.5px; font-weight: 600; color: var(--text);
+    letter-spacing: 0.04em;
+}
+.market-ticker-bar .mt-value {
+    font-size: 12px; font-weight: 600; color: var(--text);
+    font-variant-numeric: tabular-nums;
+}
+.market-ticker-bar .mt-row-mid {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-top: 1px;
+}
+.market-ticker-bar .mt-name {
+    font-size: 9px; color: var(--text-mute);
+    letter-spacing: 0.02em;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.market-ticker-bar .mt-delta {
+    font-size: 9.5px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0; margin-left: 4px;
+}
+.market-ticker-bar .mt-delta.up   { color: var(--gain); }
+.market-ticker-bar .mt-delta.down { color: var(--loss); }
+.market-ticker-bar .mt-spark-block {
+    position: relative;
+    height: 40px;
+    margin-top: 4px;
+    padding-bottom: 8px;
+    padding-right: 24px;
+}
+.market-ticker-bar .mt-spark {
+    width: 100%; height: 28px; display: block;
+}
+.market-ticker-bar .mt-y-max,
+.market-ticker-bar .mt-y-min {
+    position: absolute;
+    right: 0;
+    font-size: 7.5px;
+    color: var(--text-mute);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    pointer-events: none;
+    background: rgba(250,248,252,0.7);
+    padding: 0 1px;
+}
+.market-ticker-bar .mt-y-max { top: 0; }
+.market-ticker-bar .mt-y-min { top: 22px; }
+.market-ticker-bar .mt-x-axis {
+    position: absolute;
+    bottom: 0; left: 0; right: 24px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 7.5px;
+    color: var(--text-mute);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+.market-ticker-bar .mt-error {
+    font-size: 9px; color: #999;
+    margin-top: 2px; font-style: italic;
+}

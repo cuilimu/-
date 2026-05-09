@@ -1,0 +1,180 @@
+.ws-section { color:var(--theme-purple); font-weight:700; font-size:12px;
+  text-transform:uppercase; letter-spacing:.5px;
+  margin-bottom:6px; padding-bottom:4px; border-bottom:1px solid #e0d0ec; }
+.ws-chip { display:inline-block; margin:2px 3px; padding:2px 9px;
+  border-radius:10px; background:#f0e8f8; color:var(--theme-purple);
+  font-size:11px; font-weight:600; }
+.ws-chip-ff  { background:#e8f4e8; color:#1a6e1a; }
+.ws-chip-res { background:#fff3e0; color:#b35c00; }
+.cmd-output  { font-family:"Courier New",monospace; font-size:12px;
+  background:#111; color:#d4d4d4; border-radius:6px;
+  padding:12px 16px; margin-bottom:8px; white-space:pre; overflow-x:auto; }
+.cmd-prompt  { color:var(--text-mute); font-size:11px; font-family:monospace; margin-bottom:2px; }
+.cmd-error   { background:#2a1010; color:#ff8080; }
+.stata-preview { font-family:"Courier New",monospace; font-size:12px;
+  background:#1e1e1e; color:#9cdcfe; border-radius:4px;
+  padding:6px 10px; margin:4px 0 8px 0; }
+.biv-stat-label { color:var(--text-mute); font-size:11px; }
+.biv-stat-value { font-weight:700; font-size:14px; color:var(--text); }
+
+/* ── Factor decomposition table ── */
+.reg-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:6px; }
+.reg-table th {
+    background:#f8f4fa; color:var(--theme-purple); font-size:11px; font-weight:600;
+    text-transform:uppercase; padding:5px 8px; text-align:center;
+    border-bottom:2px solid var(--theme-purple-light); white-space:nowrap; }
+.reg-table th.col-name { text-align:left; min-width:90px; }
+.reg-table td { padding:4px 8px; border-bottom:1px solid #f0f0f0; vertical-align:top; text-align:center; }
+.reg-table td.col-name { text-align:left; font-weight:700; color:var(--text); font-size:12px; }
+.reg-table tr:hover td { background:#fdf8ff; }
+.coef-val { display:block; font-weight:700; color:var(--text); font-size:12px; }
+.coef-t   { display:block; color:#555; font-size:10.5px; }
+.coef-p   { display:block; color:#999; font-size:10px; }
+.reg-row-sig { border-left:3px solid var(--gain) !important; }
+.reg-row-sig .coef-val:first-child { color:var(--gain); }
+.reg-row-portfolio { border-left:3px solid var(--theme-purple) !important; }
+.reg-clear-btn { font-size:11px; color:#999; cursor:pointer; }
+
+/* ── STATA Results Panel ── */
+.stata-panel {
+    border: 1px solid #d4b8e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+.stata-panel-header {
+    background: var(--theme-purple);
+    color: var(--bg);
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "Segoe UI", Arial, sans-serif;
+    letter-spacing: .2px;
+}
+.stata-panel-body {
+    background: var(--bbg-header-bg);
+    height: 430px;
+    overflow-y: auto;
+    padding: 8px 12px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 12px;
+    line-height: 1.55;
+    color: #d4d4d4;
+    white-space: pre-wrap;
+    word-break: break-all;
+    border-top: 2px solid var(--theme-purple-light);
+}
+.stata-cmd-echo  { color: var(--theme-purple); font-weight: 700; }
+.stata-err-line  { color: #cc0000; }
+
+/* ── Linear Regression: subroute + compact panel ── */
+.lr-subroute-rule {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0 12px;
+}
+.lr-data-header {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-family: "Courier New", monospace;
+}
+/* Compact console (right column) */
+.stata-panel-body--compact {
+    height: 400px !important;
+}
+
+/* ── Direct-run button + command input — 2px radius ── */
+.st-key-lr_run_direct button {
+    border-radius: 2px !important;
+}
+.st-key-lr_cmd_input input {
+    border-radius: 2px !important;
+}
+
+/* ── Multiselect selected-item tags — muted purple tint ── */
+[data-baseweb="tag"] {
+    background-color: rgba(102, 8, 116, 0.10) !important;
+    border: 1px solid rgba(102, 8, 116, 0.30) !important;
+    border-radius: 2px !important;
+}
+[data-baseweb="tag"] span {
+    color: var(--theme-purple) !important;
+    font-size: 10px !important;
+    font-family: "Courier New", monospace !important;
+}
+[data-baseweb="tag"] [role="button"],
+[data-baseweb="tag"] button {
+    color: var(--theme-purple) !important;
+    opacity: 0.7 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+[data-baseweb="tag"] [role="button"]:hover,
+[data-baseweb="tag"] button:hover {
+    opacity: 1 !important;
+    background: rgba(102, 8, 116, 0.18) !important;
+}
+
+/* ── Subroute control buttons ── */
+.st-key-lr_sr_console button,
+.st-key-lr_sr_datatable button,
+.st-key-lr_sr_reload button {
+    height: 28px !important;
+    min-height: 0 !important;
+    line-height: 28px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    padding: 0 10px !important;
+    border-radius: 2px !important;
+}
+
+/* ── Verb chip buttons (left panel, prefill-only) ── */
+[class*="st-key-lr_vc_"] button {
+    height: 22px !important;
+    min-height: 0 !important;
+    line-height: 22px !important;
+    padding: 0 4px !important;
+    font-size: 9px !important;
+    font-family: "Courier New", monospace !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+    border-radius: 2px !important;
+    background: transparent !important;
+    color: var(--theme-purple) !important;
+    border: 1px solid var(--theme-purple-light) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+[class*="st-key-lr_vc_"] button:hover {
+    background: var(--theme-purple) !important;
+    color: var(--bg) !important;
+}
+
+/* ── Output log entry parts (replaces inline hex in _output_to_html) ── */
+.lr-cmd-echo {
+    color: var(--theme-purple);
+    font-weight: 700;
+    font-size: 12px;
+    font-family: "Courier New", monospace;
+    margin-bottom: 2px;
+}
+.lr-cmd-body {
+    font-size: 12px;
+    font-family: "Courier New", monospace;
+    margin-bottom: 10px;
+}
+.lr-cmd-error-body {
+    color: var(--loss);
+    font-size: 12px;
+    font-family: "Courier New", monospace;
+    margin-bottom: 10px;
+}

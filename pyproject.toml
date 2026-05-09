@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stock-engine"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "yfinance>=0.2",
+    "pandas>=2.0",
+    "numpy>=1.26",
+    "plotly>=5.18",
+    "pyarrow>=14",
+    "streamlit>=1.32",
+    "pandas_datareader>=0.10",
+    "statsmodels>=0.14",
+    "scipy>=1.11",
+    "streamlit-autorefresh>=1.0",
+    "anthropic>=0.40",
+    "notion-client>=2.2",
+    "pmdarima>=2.0",
+    "tqdm>=4.66",
+    "openpyxl>=3.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+]
+
+[project.scripts]
+stock-agent = "stock_engine.agents.cli:main"
+
+# The project root IS the stock_engine package (no subdirectory).
+# package-dir maps the import name "stock_engine" to "." (the project root),
+# then we list every subpackage explicitly so pip install -e . registers them all.
+[tool.setuptools.package-dir]
+"stock_engine" = "."
+
+[tool.setuptools.packages]
+find = {where = [".."], include = ["stock_engine*"]}
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true

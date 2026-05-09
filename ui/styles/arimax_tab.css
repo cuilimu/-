@@ -1,0 +1,848 @@
+/* ── Outer two-pane grid ───────────────────────────────────────────────
+   Streamlit's stHorizontalBlock distributes flex weights from
+   st.columns([1, 3]). To pin the left column to 380 px we drop a marker
+   element into it and use :has() to identify the row, then override flex
+   on its children. Pattern matches `theme.py` (sim/aa/home sidebars).
+
+   CRITICAL: the row caps its own height and uses `overflow: hidden` to
+   create an isolated scroll context — without this, scrolling inside one
+   pane chains up to the page-level scroll and visually drags the other
+   pane along. The columns themselves own the scrollbars.
+
+   `overscroll-behavior: contain` on each pane is a second line of defence:
+   even if scroll chaining starts when a child pane hits its boundary, the
+   chain stops at the pane and never reaches the row or the page. */
+/* ── Strategy: viewport-locked grid row height
+   ────────────────────────────────────────────────────────────────────
+   Earlier I tried `flex: 1` to claim the remaining space below the
+   topbar/command bar, but Streamlit's wrapper nesting (stContainer →
+   stVerticalBlockBorderWrapper → stVerticalBlock) kept breaking the
+   flex chain — the column ended up tall enough to fit any content, so
+   `overflow-y: auto` never had any overflow to scroll. The reliable
+   alternative is to lock the grid row to a viewport-based height
+   directly: `calc(100vh - 200px)` (≈ topbar+breadcrumb 80 + command bar
+   60 + padding 30 + safety 30). With a hard cap, the column's `height:
+   100%` resolves
+   to a real pixel value and the scrollbar appears as soon as content
+   exceeds it. */
+
+/* col_main (the right column of the simple_aa app shell) when ARIMAX is
+   active: prevent residual scroll bleed from leaking out to the page
+   or sidebar. The simple_aa parent row already has `overflow: hidden`
+   (theme.py:268-275); this is a second-line guard. */
+div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker)
+        > div:nth-child(2):has(.arx-page-marker),
+div[data-testid="stHorizontalBlock"]:has(.sim-sb-marker)
+        > div:nth-child(2):has(.arx-page-marker) {
+    overscroll-behavior: contain !important;
+}
+
+/* The grid row: pinned to a viewport-based height directly. The earlier
+   `height: 100%` (relying on flex-1 inheritance through col_main's wrap)
+   was unreliable — Streamlit's wrapper layers swallowed the flex chain,
+   the columns grew with content, and `overflow-y: auto` never fired
+   because the column was always tall enough to fit its content. A hard
+   `calc(100vh - Npx)` cap makes the height unambiguous, which means
+   columns now resolve their `height: 100%` to a real pixel value and
+   the scrollbars actually appear.
+
+   CRITICAL: this rule MUST NOT use `:has(.arx-grid-marker)` as the only
+   selector. `.arx-grid-marker` lives inside cols[0] of the inner grid,
+   so EVERY ancestor stHorizontalBlock matches — including the OUTER
+   page row from `st.columns([sidebar, main])`. Applying calc()-based
+   height to that page row shrinks the whole app (sidebar + main) by
+   Npx, leaving white below the purple sidebar AND the page itself.
+   That was the white-below bug. Fix: scope via `.st-key-arx_main_grid`
+   so only the inner columns row matches. */
+/* Chrome budget (the 100px below) accounts for the page topbar/breadcrumb
+   (~30-40px) + outer command bar with the "Run ARIMAX Sweep" button + status
+   summary (~50-60px) + block-container padding (~6-8px). Earlier we used
+   80px which under-budgets and clips the bottom of the grid (cmd_pane gets
+   cut off, making the whole pane look small). 100px is the safe floor that
+   keeps cmd_pane fully visible and lets arx_window flex to fill the rest. */
+.st-key-arx_main_grid > div[data-testid="stVerticalBlock"]
+        > div[data-testid="stHorizontalBlock"] {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+    height: calc(100vh - 100px) !important;
+    max-height: calc(100vh - 100px) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+/* Middle config column — pinned to 260px to match the outer Tsinghua-purple
+   step-nav sidebar width used on every other step in the simple-AA flow.
+   The column scrolls itself when expander content overflows. */
+.st-key-arx_main_grid > div[data-testid="stVerticalBlock"]
+        > div[data-testid="stHorizontalBlock"] > div:first-child {
+    flex: 0 0 260px !important;
+    width: 260px !important;
+    max-width: 260px !important;
+    min-width: 260px !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    display: block !important;
+}
+/* Right output column — the inner `arx_window` carries the scroll so the
+   key bar and command line stay pinned, hence overflow: hidden here. */
+.st-key-arx_main_grid > div[data-testid="stVerticalBlock"]
+        > div[data-testid="stHorizontalBlock"] > div:nth-child(2) {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+    overscroll-behavior: contain !important;
+}
+
+/* ── Config pane: visual styling + fill the column vertically. ────────
+   Grid row is `calc(100vh - 80px)`, so floor the config pane to that
+   minus its own 20px vertical padding so the pane's background paints
+   to the bottom of the column even with all accordions collapsed. */
+.st-key-arx_config_pane {
+    background: #f7f5f9 !important;
+    border: 1.5px solid #9c8fa9 !important;
+    padding: 10px 12px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06),
+                inset 0 1px 0 rgba(255,255,255,0.6);
+    position: relative;
+    min-height: calc(100vh - 120px) !important;
+    box-sizing: border-box !important;
+}
+/* Force dark text inside the config pane — prevents Streamlit's internal
+   theme-color calculations from inheriting a light text colour that was
+   computed for the dark sidebar column or any other dark ancestor. */
+.st-key-arx_config_pane p,
+.st-key-arx_config_pane span:not([data-testid]),
+.st-key-arx_config_pane label,
+.st-key-arx_config_pane [data-testid="stMarkdownContainer"] *,
+.st-key-arx_config_pane [data-testid="stCaptionContainer"] p,
+.st-key-arx_config_pane [data-testid="stCheckbox"] span,
+.st-key-arx_config_pane input:not([type="range"]),
+.st-key-arx_config_pane [data-testid="stSelectboxVirtualDropdown"] span,
+.st-key-arx_config_pane [data-baseweb="select"] span {
+    color: var(--text) !important;
+}
+.st-key-arx_config_pane label,
+.st-key-arx_config_pane [data-testid="stCaptionContainer"] p {
+    color: var(--text-secondary) !important;
+}
+/* Widget input background — light so text remains readable */
+.st-key-arx_config_pane input:not([type="range"]),
+.st-key-arx_config_pane [data-baseweb="select"] {
+    background: var(--bg) !important;
+}
+/* Scoped scrollbar for the left column (the one that scrolls).
+   Same `.st-key-arx_main_grid`-scoped path as the column rules above so
+   we don't accidentally style the outer page-row scrollbars. */
+.st-key-arx_main_grid > div[data-testid="stVerticalBlock"]
+        > div[data-testid="stHorizontalBlock"]
+        > div:first-child::-webkit-scrollbar { width: 8px; }
+.st-key-arx_main_grid > div[data-testid="stVerticalBlock"]
+        > div[data-testid="stHorizontalBlock"]
+        > div:first-child::-webkit-scrollbar-thumb {
+    background: #c9b8d4; border-radius: 4px;
+}
+.st-key-arx_main_grid > div[data-testid="stVerticalBlock"]
+        > div[data-testid="stHorizontalBlock"]
+        > div:first-child::-webkit-scrollbar-track { background: transparent; }
+
+/* Sticky back-button container at the bottom of the config pane. */
+.st-key-arx_sticky_back {
+    position: sticky !important;
+    bottom: -10px;
+    background: linear-gradient(180deg,
+        rgba(247,245,249,0.0) 0%,
+        rgba(247,245,249,0.95) 30%,
+        #f7f5f9 100%) !important;
+    padding: 16px 0 8px !important;
+    margin-top: 16px !important;
+    border-top: 1px solid #d4c4dc !important;
+    z-index: 10;
+}
+.st-key-arx_sticky_back button {
+    width: 100% !important;
+    background: var(--bg) !important;
+    border: 1.5px solid var(--theme-purple) !important;
+    color: var(--theme-purple) !important;
+    font-weight: 700 !important;
+    letter-spacing: .04em !important;
+}
+.st-key-arx_sticky_back button:hover {
+    background: #faf6fc !important;
+    box-shadow: 0 1px 4px rgba(102,8,116,0.18) !important;
+}
+
+/* ── Output area framing ───────────────────────────────────────────────
+   Natural stack rather than nested flex (Streamlit wraps each container in
+   its own VerticalBlock, which makes deep flex hierarchies fragile). The
+   key bar sits at the top, the window scrolls internally, the command
+   pane sits at the bottom. */
+.st-key-arx_output_pane {
+    background: var(--bg) !important;
+    border: 1.5px solid var(--theme-purple-dark) !important;
+    padding: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+}
+/* Reach into the inner stVerticalBlock so its children can flex. */
+.st-key-arx_output_pane > div[data-testid="stVerticalBlock"] {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    gap: 0 !important;
+}
+.st-key-arx_output_pane > div[data-testid="stVerticalBlock"] > div[data-testid="stElementContainer"] {
+    flex: 0 0 auto;
+}
+/* Pierce the stElementContainer wrappers Streamlit inserts between the
+   stVerticalBlock and each keyed container (.st-key-arx_key_bar /
+   _window / _cmd_pane). `display: contents` removes the wrapper from
+   the layout tree so the keyed divs become direct flex children of
+   the column above — only then does `flex: 1 1 0` on .st-key-arx_window
+   actually claim the remaining vertical space. Without this, the window
+   collapses to its content height and the right pane shows ~500px of
+   blank white in the idle state. */
+.st-key-arx_output_pane > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"]:has(> .st-key-arx_key_bar),
+.st-key-arx_output_pane > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"]:has(> .st-key-arx_window),
+.st-key-arx_output_pane > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"]:has(> .st-key-arx_cmd_pane) {
+    display: contents !important;
+}
+.st-key-arx_key_bar,
+.st-key-arx_cmd_pane {
+    flex: 0 0 auto !important;
+}
+
+/* Key bar (segmented buttons). Menu content is now wrapped in a
+   `st.expander("▾ Show keys", expanded=False)` so when collapsed the bar
+   is just ~40px tall (expander toggle only). When the user opens the
+   expander, content takes its natural height — no max-height cap needed
+   because the user has explicitly asked to see the keys. */
+.st-key-arx_key_bar {
+    background: #2b0533 !important;
+    border-bottom: 1px solid var(--theme-purple-dark) !important;
+    padding: 4px 8px !important;
+}
+/* Expander wrapping the menu — flip to dark theme so the "▾ Show keys"
+   toggle reads against the dark-purple menu bar. The body inherits the
+   surrounding chrome when opened. */
+.st-key-arx_key_bar [data-testid="stExpander"] {
+    background: transparent !important;
+    border: none !important;
+}
+.st-key-arx_key_bar [data-testid="stExpander"] summary,
+.st-key-arx_key_bar [data-testid="stExpander"] [data-testid="stExpanderToggleIcon"] {
+    background: transparent !important;
+    color: #c9a4d4 !important;
+    font-family: 'JetBrains Mono', 'Consolas', monospace !important;
+    font-size: 10.5px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.04em !important;
+    padding: 4px 8px !important;
+}
+.st-key-arx_key_bar [data-testid="stExpander"] summary:hover {
+    color: #e8c8f0 !important;
+}
+.st-key-arx_key_bar [data-testid="stExpander"] details > div {
+    padding: 4px 0 0 !important;
+}
+.st-key-arx_key_bar [data-testid="stHorizontalBlock"] { gap: 4px !important; }
+[class*="st-key-arx_key_"] button {
+    background: #1a0220 !important;
+    color: #c9a4d4 !important;
+    border: 1px solid var(--theme-purple-dark) !important;
+    padding: 4px 10px !important;
+    min-height: 28px !important;
+    height: 28px !important;
+    font-family: 'JetBrains Mono', 'Consolas', monospace !important;
+    font-size: 10.5px !important;
+    font-weight: 600 !important;
+    letter-spacing: .02em !important;
+    text-transform: lowercase !important;
+    border-radius: 2px !important;
+}
+[class*="st-key-arx_key_"] button:hover:not(:disabled) {
+    background: #3a0a44 !important;
+    color: #e8c8f0 !important;
+    border-color: #8a4d99 !important;
+}
+
+/* Output window itself — scrollable, fills remaining height. Self-
+   contained scroll: a hard boundary at the window edges prevents any
+   chain into the parent pane or page. Background uses the same `#fdf8ff`
+   tint as .stata-panel-body in factor_workspace_tab so the area reads
+   as a framed virtual-terminal panel rather than blank pane. The
+   `min-height: 480px` is a guaranteed floor — even if the menu (collapsed
+   ~40px / expanded ~280px) or other chrome eats more vertical room than
+   expected, the user always sees a substantial display surface. On larger
+   viewports `flex: 1 1 0` lets it grow to fill whatever the grid claims
+   from `calc(100vh - 100px)`. */
+.st-key-arx_window {
+    flex: 1 1 0 !important;
+    min-height: 480px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    padding: 0 16px 8px !important;         /* top=0 — Results bar uses neg-margin to fill */
+    background: #fdf8ff !important;
+}
+/* Make arx_window's content stack a flex column so a tagged child (the
+   .arx-log-stream during a live sweep) can stretch to fill the empty
+   space below the LIVE SWEEP / progress / current-model header. Without
+   this, the window leaves ~400 px of blank white between "Waiting for
+   the first iteration to complete…" and the command line at viewport
+   bottom. min-height:100% (not height) so longer content can still
+   grow past the viewport and trigger arx_window's own scrollbar. */
+.st-key-arx_window > div[data-testid="stVerticalBlock"] {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100% !important;
+    gap: 0 !important;
+}
+.st-key-arx_window > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"] {
+    flex: 0 0 auto !important;
+}
+/* The element-container that owns an .arx-log-stream stretches. Direct-
+   child only — the log stream rendered inside the post-run "Sweep
+   history" expander is nested deeper and is not affected. */
+.st-key-arx_window > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"]:has(> div > .arx-log-stream),
+.st-key-arx_window > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"]:has(> .arx-log-stream) {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+.st-key-arx_window > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"]:has(> div > .arx-log-stream)
+    .arx-log-stream,
+.st-key-arx_window > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"]:has(> .arx-log-stream)
+    .arx-log-stream {
+    flex: 1 1 0 !important;
+    height: 100% !important;
+    max-height: none !important;
+    min-height: 200px !important;
+}
+.st-key-arx_window::-webkit-scrollbar { width: 8px; }
+.st-key-arx_window::-webkit-scrollbar-thumb {
+    background: #c9b8d4; border-radius: 4px;
+}
+.st-key-arx_window::-webkit-scrollbar-track { background: transparent; }
+
+/* Command line at the bottom of the output area. Sized up — this is now
+   the *primary* input affordance per the menu-collapsed-by-default design,
+   so it deserves more visual weight than a 28px throwaway. */
+.st-key-arx_cmd_pane {
+    background: #1a0220 !important;
+    border-top: 2px solid var(--theme-purple-dark) !important;
+    padding: 8px 12px !important;
+}
+.st-key-arx_cmd_pane label { display: none !important; }
+.st-key-arx_cmd_pane [data-testid="stTextInputRootElement"] {
+    background: transparent !important;
+    border: none !important;
+}
+.st-key-arx_cmd_pane [data-testid="stTextInput"] > div {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+.st-key-arx_cmd_pane input {
+    background: transparent !important;
+    color: #e8c8f0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-family: 'JetBrains Mono', 'Consolas', monospace !important;
+    font-size: 13px !important;
+    min-height: 36px !important;
+    line-height: 1.4 !important;
+    padding-left: 0 !important;
+}
+.st-key-arx_cmd_pane input::placeholder {
+    color: #8c5fa3 !important;
+    font-size: 12px !important;
+    opacity: 0.85 !important;
+}
+.arx-cmd-prompt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #00ff7f;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-weight: 700;
+    font-size: 16px;
+    height: 36px;
+}
+
+/* ── Section labels inside the window ─────────────────────────────── */
+.arx-section-label {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--theme-purple-dark);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    border-bottom: 1px solid #d4c4dc;
+    padding-bottom: 4px;
+    margin: 0 0 10px;
+}
+.arx-empty {
+    text-align: center;
+    color: var(--text-mute);
+    padding: 60px 32px;
+}
+.arx-empty h3 {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    color: var(--theme-purple-dark);
+    letter-spacing: .12em;
+    font-size: 16px;
+    margin-bottom: 14px;
+}
+.arx-empty p { font-size: 12px; line-height: 1.7; margin: 0 auto; max-width: 560px; }
+.arx-empty code {
+    background: #1a0220; color: #00ff7f; padding: 1px 6px;
+    border-radius: 2px; font-size: 11px;
+}
+
+/* ── Idle view — three structured blocks that fill the window so the
+   pre-run state isn't a 500px white void with a centered paragraph. */
+.arx-idle-recap {
+    background: #f8f4fa;
+    border-left: 3px solid var(--theme-purple);
+    padding: 12px 16px;
+    margin-bottom: 16px;
+}
+.arx-idle-keymap {
+    background: #f8f8f8;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+}
+.arx-idle-check {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 12px 16px;
+}
+.arx-idle-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+}
+.arx-idle-table td {
+    padding: 4px 6px;
+    border-bottom: 1px solid #f0e8f5;
+    vertical-align: middle;
+}
+.arx-idle-table tr:last-child td { border-bottom: none; }
+.arx-idle-table td:first-child {
+    color: var(--text-mute);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    width: 38%;
+}
+.arx-idle-table td.arx-idle-val {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 10.5px;
+    color: var(--text);
+}
+.arx-idle-keymap-table td:first-child {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 10.5px;
+    color: var(--theme-purple-dark);
+    font-weight: 700;
+    width: 22%;
+}
+.arx-idle-keymap-table td:nth-child(2) {
+    font-size: 11px;
+    color: var(--text);
+    width: 22%;
+}
+.arx-idle-keymap-table td:nth-child(3) {
+    font-size: 10px;
+    color: var(--text-secondary);
+}
+.arx-idle-check-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    align-items: center;
+}
+.arx-idle-check-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text);
+}
+.arx-idle-check-item .arx-ok   { color: var(--gain); font-weight: 700; }
+.arx-idle-check-item .arx-bad  { color: var(--loss); font-weight: 700; }
+.arx-idle-check-item .arx-note { color: var(--text-mute); font-size: 10px; }
+
+/* ── Live progress display ─────────────────────────────────────────── */
+.arx-progress-bar {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 12px;
+    color: #1a0220;
+    background: #faf6fc;
+    padding: 8px 10px;
+    border: 1px solid var(--theme-purple-light);
+    margin-bottom: 8px;
+    line-height: 1.7;
+    white-space: pre;
+}
+.arx-progress-fill { color: var(--theme-purple-dark); font-weight: 700; }
+.arx-progress-empty { color: #d4c4dc; }
+.arx-rolling-bar {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 10.5px;
+    color: var(--text-mute);
+    background: var(--bg);
+    padding: 4px 10px;
+    border-left: 2px solid var(--theme-purple-light);
+    margin-bottom: 4px;
+    white-space: pre;
+}
+.arx-current-model {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 11px;
+    color: var(--theme-purple);
+    background: var(--bg);
+    padding: 6px 10px;
+    border-left: 3px solid var(--theme-purple-light);
+    margin-bottom: 8px;
+}
+.arx-log-stream {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 10.5px;
+    color: var(--text);
+    background: #faf7fc;
+    padding: 8px 10px;
+    border: 1px solid #d4c4dc;
+    max-height: 360px;
+    overflow-y: auto;
+    line-height: 1.55;
+}
+.arx-log-line { white-space: pre; }
+.arx-log-pass { color: #006e30; font-weight: 700; }
+.arx-log-fail { color: #b04040; font-weight: 700; }
+.arx-log-num   { color: var(--text-mute); }
+.arx-completion {
+    background: #e8f5e9;
+    color: #1b5e20;
+    padding: 8px 10px;
+    border: 1px solid #4caf50;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 12px;
+}
+.arx-completion-error {
+    background: #fdecec;
+    color: #9a0e0e;
+    padding: 8px 10px;
+    border: 1px solid var(--loss);
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 12px;
+}
+
+/* ── Menu bar (top of output pane) — pill-style action buttons grouped
+   by category (EDA / Stationarity / Models / Plots / Other). Compact so
+   the menu uses ~120 px and leaves the rest of the column to the
+   stacking console below. */
+.arx-menu-group-label {
+    color: var(--theme-purple-light);
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin: 4px 0 2px;
+    padding-left: 2px;
+}
+.arx-menu-hint {
+    background: #1a0220;
+    color: #c8a0dc;
+    border: 1px dashed var(--theme-purple-dark);
+    border-radius: 2px;
+    padding: 6px 10px;
+    margin: 4px 0;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 11px;
+    font-style: italic;
+}
+.arx-menu-status {
+    color: #c8a0dc;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 10.5px;
+    line-height: 28px;
+    padding-left: 8px;
+}
+/* Streamlit selectbox sitting inside the (dark) menu bar — flip to a
+   dark theme so the white default doesn't break the visual continuity. */
+.st-key-arx_key_bar [data-testid="stSelectbox"] > div > div {
+    background: #1a0220 !important;
+    border: 1px solid var(--theme-purple-dark) !important;
+    color: #e8c8f0 !important;
+}
+.st-key-arx_key_bar [data-testid="stSelectbox"] svg { color: #c8a0dc !important; }
+
+/* ── Console entry — each menu click appends one of these. Entries
+   stack newest-first; each is composed of a green-prompt line followed
+   by the body (text / figure / table / block). */
+.arx-cons-entry {
+    margin: 16px 0 0;
+    padding-bottom: 2px;
+    border-bottom: 1px dashed #ddd;
+}
+.arx-cons-prompt {
+    color: #006e30;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 2px 4px;
+    background: #f6fbf7;
+    border-left: 3px solid #006e30;
+}
+.arx-cons-elapsed {
+    float: right;
+    color: var(--text-mute);
+    font-weight: 400;
+    font-size: 10px;
+    padding-top: 1px;
+}
+.arx-cons-text {
+    background: #1a0220 !important;       /* ARX_DARK_CHROME — purple-tinted terminal */
+    color: #d4d4d4 !important;
+    padding: 10px 14px !important;
+    border-radius: 0 !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 11.5px !important;
+    line-height: 1.45 !important;
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    margin: 4px 0 0 !important;
+    overflow-x: auto !important;
+}
+.arx-cons-err {
+    background: #2a1010 !important;
+    color: #ff8080 !important;
+    border-left: 3px solid #cc0000;
+}
+
+/* ── Results panel header — sits at the top of arx_window. Mirrors the
+   .stata-panel-header pattern from factor_workspace_tab.py so ARIMAX's
+   output region reads as a clearly framed virtual-terminal panel: purple
+   bar with 'Results' on the left and entry count on the right. NOT
+   sticky — sticky positioning conflicts with the `display: contents`
+   ancestors in the arx_output_pane flex chain and was eating arx_window's
+   visible height; we just render it as a normal block flush to the top
+   edge (arx_window has padding: 0 0 8px). */
+.arx-results-bar {
+    background: var(--theme-purple);                  /* SECTION_HEADER */
+    color: var(--bg);
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "Segoe UI", Arial, sans-serif;
+    letter-spacing: 0.3px;
+    border-bottom: 2px solid var(--theme-purple-light);     /* SIDEBAR_BORDER */
+    margin: 0 -16px 10px;                  /* extend to arx_window edges (no sticky) */
+}
+.arx-results-title {
+    text-transform: none;
+}
+.arx-results-count {
+    font-weight: 400;
+    font-size: 10px;
+    color: #d4b8e0;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    letter-spacing: 0;
+}
+
+/* ── STATA report card — kind="stata_summary" ──────────────────────────────
+   Light-surface structured output for SARIMAX regression results.
+   Three sections: header diagnostics / coefficient table / post-estimation.
+   Background ARX_STATA_BG (#fafaf7) intentionally contrasts with dark
+   .arx-cons-text logs to signal "structured statistical output", not log. */
+.arx-stata {
+    background: #fafaf7;                  /* ARX_STATA_BG */
+    border: 1px solid var(--theme-purple-dark);            /* ARX_TERMINAL_BORDER */
+    border-left: 3px solid var(--theme-purple);       /* SECTION_HEADER */
+    margin: 4px 0 0;
+    min-height: 360px;
+    font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--text);                       /* MAIN_TEXT */
+    overflow-x: auto;
+}
+.arx-stata-title {
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--theme-purple);                       /* SECTION_HEADER */
+    padding: 8px 16px 6px;
+    letter-spacing: 0.3px;
+}
+.arx-stata-rule {
+    border: none;
+    border-top: 1px solid #c8b8d0;        /* ARX_STATA_RULE */
+    margin: 0 16px;
+}
+.arx-stata-hdr,
+.arx-stata-diag {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 24px;
+    padding: 8px 16px;
+    font-size: 10.5px;
+}
+.arx-stata-hdr-row,
+.arx-stata-diag-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 1px 0;
+    min-height: 16px;
+}
+.arx-stata-hdr-lbl,
+.arx-stata-diag-lbl {
+    color: #c9a4d4;                       /* ARX_ACCENT_TEXT */
+    font-size: 9px;
+    white-space: nowrap;
+    padding-right: 8px;
+    flex-shrink: 0;
+}
+.arx-stata-hdr-val {
+    color: var(--text);                       /* MAIN_TEXT */
+    font-size: 10.5px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.arx-stata-diag-val {
+    color: var(--text-secondary);                       /* MAIN_TEXT_SECONDARY */
+    font-size: 10.5px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.arx-stata-coef {
+    padding: 0 16px 8px;
+    box-sizing: border-box;
+}
+.arx-stata-coef table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+.arx-stata-coef th {
+    font-size: 9px;
+    font-weight: 600;
+    color: #c9a4d4;                       /* ARX_ACCENT_TEXT */
+    text-align: right;
+    padding: 4px 6px;
+    border-bottom: 1px solid #c8b8d0;     /* ARX_STATA_RULE */
+    white-space: nowrap;
+}
+.arx-stata-coef th:first-child {
+    text-align: left;
+    min-width: 120px;
+}
+.arx-stata-coef th.num { width: 68px; }
+.arx-stata-coef th.z   { width: 56px; }
+.arx-stata-coef th.p   { width: 56px; }
+.arx-stata-coef th.ci  { width: 64px; }
+.arx-stata-coef td {
+    padding: 4px 6px;
+    height: 24px;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    vertical-align: middle;
+    white-space: nowrap;
+    border-bottom: 1px solid rgba(200, 184, 208, 0.25);
+}
+.arx-stata-coef td:first-child {
+    text-align: left;
+    color: var(--text);                       /* MAIN_TEXT — always, regardless of sig */
+    border-left: 3px solid transparent;
+    padding-left: 6px;
+}
+.arx-stata-coef td.num {
+    text-align: right;
+}
+.arx-stata-coef tr:hover td {
+    background: rgba(102, 8, 116, 0.04);
+}
+
+/* Significance encoding — weight + left-border accent. NO red/green. */
+.arx-stata-coef tr.sig-strong td        { color: var(--text); font-weight: 700; }
+.arx-stata-coef tr.sig-strong td:first-child {
+    color: var(--text);
+    border-left: 3px solid var(--theme-purple);       /* ARX_STATA_SIG_MARKER */
+}
+.arx-stata-coef tr.sig-med    td        { color: #3a3a3a; font-weight: 600; }
+.arx-stata-coef tr.sig-med    td:first-child {
+    color: var(--text);
+    border-left: 3px solid #9b30b0;       /* ARX_STATA_SIG_MED_MARKER */
+}
+.arx-stata-coef tr.sig-weak   td        { color: var(--text-secondary); font-weight: 400; }
+.arx-stata-coef tr.sig-weak   td:first-child {
+    color: var(--text);
+    border-left: 3px dotted var(--theme-purple);
+}
+.arx-stata-coef tr.insig      td        { color: #999999; font-weight: 400; }
+.arx-stata-coef tr.insig      td:first-child {
+    color: var(--text);
+    border-left: 3px solid transparent;
+}
+
+.arx-stata-coef-empty {
+    text-align: center !important;
+    color: #c9a4d4 !important;
+    padding: 12px 0 !important;
+    font-style: italic;
+}
+
+/* ── Config panel sub-route toggle (Config | AutoARIMA) ── */
+.arx-cfg-sr-rule {
+    height: 1px;
+    background: var(--theme-purple-light);
+    margin: 8px 0 10px;
+    opacity: 0.6;
+}
+.st-key-arx_cfg_sr_main button,
+.st-key-arx_cfg_sr_ap button {
+    height: 28px !important;
+    min-height: 0 !important;
+    line-height: 28px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    padding: 0 6px !important;
+    border-radius: 2px !important;
+}
+</style>

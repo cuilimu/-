@@ -1,0 +1,253 @@
+/* ── Hide Streamlit chrome (fake-column sidebar used instead) ── */
+section[data-testid='stSidebar'] { display: none !important; }
+header[data-testid='stHeader']   { display: none !important; }
+footer   { display: none !important; }
+#MainMenu { display: none !important; }
+.block-container {
+    padding-top: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: 100% !important;
+}
+
+/* ── Sidebar column ── */
+div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker) > div:first-child {
+    background: var(--theme-purple) !important;
+    min-height: 100vh !important;
+    padding: 16px 8px 24px !important;
+    border-radius: 0 !important;
+}
+
+/* ── All buttons inside sidebar: flat nav style ── */
+div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker) > div:first-child
+  div[data-testid="stButton"] button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: rgba(255,255,255,0.65) !important;
+    font-size: 11px !important;
+    padding: 3px 6px 3px 8px !important;
+    min-height: 0 !important;
+    height: 26px !important;
+    text-align: left !important;
+    border-radius: 3px !important;
+    width: 100% !important;
+    display: block !important;
+    transition: background 0.1s, color 0.1s !important;
+    line-height: 26px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    box-sizing: border-box !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker) > div:first-child
+  div[data-testid="stButton"] button:hover {
+    background: rgba(255,255,255,0.1) !important;
+    color: rgba(255,255,255,0.92) !important;
+}
+
+/* ── Sidebar: all input labels white ── */
+div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker) > div:first-child
+  label, div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker) > div:first-child p {
+    color: rgba(255,255,255,0.6) !important;
+    font-size: 10px !important;
+}
+/* Sidebar: input boxes dark */
+div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker) > div:first-child
+  input {
+    background: rgba(0,0,0,0.25) !important;
+    color: var(--bg) !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    font-size: 11px !important;
+}
+
+div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker) > div:first-child
+  [data-testid="stCheckbox"] span {
+    color: rgba(255,255,255,0.65) !important;
+    font-size: 10.5px !important;
+}
+/* Sidebar: date input spacing */
+div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker) > div:first-child
+  [data-testid="stDateInput"] {
+    margin-bottom: 4px !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker) > div:first-child
+  [data-testid="stCheckbox"] {
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker) > div:first-child
+  [data-testid="stCaptionContainer"] {
+    color: rgba(255,255,255,0.5) !important;
+    font-size: 10px !important;
+    margin-top: 1px !important;
+    margin-bottom: 4px !important;
+    line-height: 1.3 !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker) > div:first-child
+  [data-testid="stNumberInput"] {
+    margin-bottom: 4px !important;
+}
+div[data-testid="stHorizontalBlock"]:has(.aa-sb-marker) > div:first-child
+  [data-testid="stSelectbox"] {
+    margin-bottom: 4px !important;
+}
+
+/* ── Sidebar typography ── */
+.aa-sb-section {
+    font-size: 8.5px; color: rgba(255,255,255,0.38);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin: 8px 4px 4px !important;
+    font-weight: 500;
+}
+.aa-sb-step-active {
+    font-size: 11px;
+    color: rgba(255,255,255,0.96);
+    font-weight: 600;
+    background: rgba(255,255,255,0.16);
+    border-left: 2px solid rgba(255,255,255,0.75);
+    border-radius: 0 3px 3px 0;
+    padding: 3px 6px 3px 10px;
+    margin-bottom: 2px;
+    display: block;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    height: 26px !important;
+    line-height: 26px !important;
+    box-sizing: border-box !important;
+}
+.aa-sb-step-done {
+    font-size: 11px;
+    color: rgba(255,255,255,0.55);
+    padding: 3px 6px 3px 8px;
+    display: block;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    height: 26px !important;
+    line-height: 26px !important;
+    box-sizing: border-box !important;
+}
+.aa-sb-divider  { height: 1px; background: rgba(255,255,255,0.12); margin: 10px 0; }
+
+/* ── Analytics Workbench group ── */
+.aa-sb-section-group {
+    font-size: 8.5px;
+    color: rgba(255,255,255,0.38);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 4px 4px 4px !important;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.aa-sb-section-group--open {
+    color: rgba(255,255,255,0.70);
+}
+
+/* ── Workbench sub-item: active state (markdown, not button) ── */
+.aa-sb-subitem-active {
+    font-size: 11px;
+    color: rgba(255,255,255,0.96);
+    font-weight: 600;
+    background: rgba(255,255,255,0.16);
+    border-left: 2px solid rgba(255,255,255,0.75);
+    border-radius: 0 3px 3px 0;
+    padding: 0 6px 0 14px;
+    margin-bottom: 2px;
+    display: block;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    height: 24px !important;
+    line-height: 24px !important;
+    box-sizing: border-box !important;
+}
+
+/* ── Workbench sub-item buttons: 24px height, 16px indent ── */
+.st-key-aa_sb_wb_regression button,
+.st-key-aa_sb_wb_arimax button {
+    height: 24px !important;
+    line-height: 24px !important;
+    padding: 0 6px 0 16px !important;
+    font-size: 11px !important;
+}
+.aa-sb-logo     { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+.aa-sb-title    { font-size: 13px; font-weight: 600; color: var(--bg); }
+.aa-sb-subtitle { font-size: 8.5px; color: rgba(255,255,255,0.42);
+                  letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ── Step Rail (replaces breadcrumb) ── */
+.aa-breadcrumb {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    background: #fafafa;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.aa-bc-step {
+    font-size: 9.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(0,0,0,0.25);
+    padding: 0 10px;
+    height: 32px;
+    line-height: 32px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border-bottom: 2px solid transparent;
+}
+.aa-bc-step.done {
+    color: var(--text-secondary);
+}
+.aa-bc-step.active {
+    color: var(--theme-purple);
+    border-bottom: 2px solid var(--theme-purple);
+    background: #fff;
+    font-weight: 600;
+}
+.aa-bc-sep {
+    font-size: 9px;
+    color: var(--border);
+    line-height: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    padding: 0 1px;
+}
+
+/* ── BBG-style header bar ── */
+.bbg-header {
+    background: #0a0e1a;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 5px 12px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    max-width: 100%;
+    overflow: hidden;
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+.bbg-tag {
+    background: var(--theme-purple);
+    color: var(--bg);
+    font-size: 9px;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 2px;
+    letter-spacing: 0.12em;
+}
+.bbg-header-sep { margin-left: auto; }

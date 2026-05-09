@@ -1,0 +1,104 @@
+/* ── quant_console.css — Shared console primitives (Regression + ARIMAX)
+   Both modules load this before their own module CSS.
+   All values via var() from :root in theme.py. Page-local accent literals
+   (#d4d4d4, #9cdcfe, #e8c8f0, #2a1010, #ff8080) are permitted per CLAUDE.md
+   because they are not theme-level decisions. */
+
+/* Results bar — purple header strip at top of output pane */
+.qc-results-bar {
+    background: var(--theme-purple);
+    color: var(--bg);
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "Segoe UI", Arial, sans-serif;
+    letter-spacing: .2px;
+    border-bottom: 2px solid var(--theme-purple-light);
+}
+
+/* Console output body — dark terminal surface */
+.qc-console {
+    background: var(--bbg-header-bg);
+    color: #d4d4d4;
+    font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+    font-size: 11px;
+    line-height: 1.55;
+    padding: 8px 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+    min-height: 320px;
+}
+
+/* Command echo line rendered inside the console log */
+.qc-cmd-prompt {
+    color: var(--theme-purple);
+    font-weight: 700;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    margin-bottom: 4px;
+    display: block;
+}
+
+/* STATA syntax preview bar — shown above the run button in LR */
+.qc-preview-bar {
+    background: var(--bbg-header-bg);
+    color: #9cdcfe;
+    font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+    font-size: 11px;
+    border-radius: 2px;
+    padding: 6px 10px;
+    margin: 4px 0 8px 0;
+    border-left: 2px solid var(--theme-purple);
+}
+
+/* Command input zone — pinned at bottom of output pane */
+.qc-cmd-pane {
+    background: var(--bbg-header-bg);
+    border-top: 2px solid var(--theme-purple-dark);
+    padding: 8px 12px;
+}
+.qc-cmd-pane input {
+    background: transparent !important;
+    color: #e8c8f0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-family: 'JetBrains Mono', 'Consolas', monospace !important;
+    font-size: 13px !important;
+    min-height: 36px !important;
+}
+
+/* One console log entry (separator between commands) */
+.qc-entry {
+    margin: 16px 0 0;
+    padding-bottom: 0;
+    border-bottom: 1px dashed var(--border);
+}
+
+/* Error output block */
+.qc-error {
+    background: #2a1010;
+    color: #ff8080;
+    border-left: 3px solid var(--loss);
+    padding: 8px 12px;
+}
+
+/* Cross-module navigation chip (e.g. "ARIMAX → STEP 8 ▸" in LR workspace) */
+.qc-step-chip {
+    display: inline-block;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 10px;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 2px 8px;
+    cursor: pointer;
+    letter-spacing: .04em;
+}
+.qc-step-chip:hover {
+    border-color: var(--theme-purple);
+    color: var(--theme-purple);
+}

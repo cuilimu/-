@@ -1,0 +1,29 @@
+.bbg-wrap { border:1px solid #d4b8e0; border-radius:6px; overflow:hidden; margin-top:6px; }
+.bbg-thead {
+    display:grid; grid-template-columns:0.4fr 1.1fr 2.0fr 1.0fr 1.0fr 1.2fr 0.8fr 0.35fr;
+    background:var(--theme-purple); color:var(--bg); font-size:10px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.4px; padding:5px 8px; gap:0;
+}
+.bbg-thead-grp {
+    display:grid;
+    grid-template-columns:0.4fr 1.1fr 2.0fr 1.0fr 1.0fr 1.2fr 0.8fr 0.35fr;
+    background:var(--theme-purple-dark);
+    font-size:9px; font-weight:600; letter-spacing:.3px;
+    padding:3px 8px; color:#e8c8f0;
+}
+.bbg-th { padding:2px 4px; white-space:nowrap; }
+.bbg-th.r { text-align:right; }
+.bbg-row {
+    display:grid; grid-template-columns:36px 90px 1fr 90px 90px 100px 64px 32px;
+    border-top:1px solid #f0e8f8; align-items:center;
+    padding:0 8px; min-height:40px; background:var(--bg); gap:0;
+}
+.bbg-row:hover { background:#fdf5ff; }
+.bbg-row.bbg-totals { background:#f8f4fa; border-top:2px solid var(--theme-purple-light); }
+.bbg-num   { color:var(--text-mute); font-size:11px; font-weight:600; padding:2px 4px; }
+.bbg-ticker{ font-weight:700; font-size:13px; color:var(--text); padding:2px 4px; letter-spacing:.3px; }
+.bbg-val   { font-size:12px; color:var(--text); text-align:right; padding:2px 4px; }
+.bbg-sub   { font-size:10px; color:var(--text-mute); }
+.bbg-warn  { font-size:10px; color:#d97706; font-weight:600; }
+.bbg-cash  { font-size:11px; color:var(--theme-purple); font-weight:700; padding:2px 4px; }
+.bbg-wt    { font-size:11px; color:var(--theme-purple); font-weight:700; text-align:right; padding:2px 4px; }

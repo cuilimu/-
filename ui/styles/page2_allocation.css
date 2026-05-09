@@ -1,0 +1,181 @@
+/* ── STATA-style outer frame on each module ── */
+.st-key-p2_constraints,
+.st-key-p2_methods,
+.st-key-p2_cands {
+    border: 1.5px solid #9c8fa9 !important;
+    background: #f7f5f9 !important;
+    padding: 10px 12px 12px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06),
+                inset 0 1px 0 rgba(255,255,255,0.6);
+    margin-bottom: 14px;
+}
+[class*="st-key-p2_cand_"] {
+    border: 1.5px solid #9c8fa9 !important;
+    background: var(--bg) !important;
+    padding: 0 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06),
+                inset 0 1px 0 rgba(255,255,255,0.6);
+    margin-bottom: 16px;
+}
+
+/* ── Section labels (uppercase tiny text) ── */
+.p2-sec {
+    font-size: 9px; color: var(--text-mute);
+    letter-spacing: .12em; text-transform: uppercase; font-weight: 600;
+    border-bottom: 1px solid #c9c0d4;
+    padding-bottom: 4px; margin: 0 0 8px;
+}
+
+/* ── STATA-style module title bar (per candidate) ── */
+.p2-title {
+    background: linear-gradient(180deg,#f5f3f7,#ece9ef);
+    border-bottom: 1px solid #d8d4dc;
+    padding: 7px 14px;
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Segoe UI', sans-serif;
+}
+.p2-title .lbl {
+    font-size: 12px; font-weight: 700; color: var(--text); letter-spacing:.02em;
+}
+.p2-title .tag {
+    font-size: 8.5px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    padding: 2px 7px; border: 1px solid;
+}
+.p2-body { padding: 12px 14px 8px; }
+.p2-cap {
+    font-size: 10.5px; color: #555; margin: 0 0 8px;
+    font-family: 'Segoe UI', sans-serif;
+}
+.p2-cap b { color: var(--text); }
+
+/* ── Bloomberg-style allocation table ── */
+.bbg2-wrap   { border: 1px solid #d4b8e0; background:var(--bg); margin:8px 0 4px; }
+.bbg2-thgrp  {
+    display: grid;
+    grid-template-columns: 0.4fr 1.2fr 1.7fr 1.0fr 1.0fr 1.2fr 0.8fr;
+    background: var(--theme-purple-dark); color: #e8c8f0;
+    font-size: 9px; font-weight: 600; letter-spacing: .3px;
+    padding: 3px 8px;
+}
+.bbg2-thead {
+    display: grid;
+    grid-template-columns: 0.4fr 1.2fr 1.7fr 1.0fr 1.0fr 1.2fr 0.8fr;
+    background: var(--theme-purple); color: var(--bg);
+    font-size: 10px; font-weight: 700; letter-spacing: .4px;
+    text-transform: uppercase; padding: 5px 8px;
+}
+.bbg2-th     { padding: 2px 4px; white-space: nowrap; }
+.bbg2-th.r   { text-align: right; }
+.bbg2-row    {
+    display: grid;
+    grid-template-columns: 0.4fr 1.2fr 1.7fr 1.0fr 1.0fr 1.2fr 0.8fr;
+    border-top: 1px solid #f0e8f8;
+    align-items: baseline;
+    padding: 7px 8px;
+    background: var(--bg);
+    font-size: 11.5px; color: var(--text);
+    font-family: 'Segoe UI', sans-serif;
+}
+.bbg2-row > span { padding: 0 4px; font-variant-numeric: tabular-nums; }
+.bbg2-row .r     { text-align: right; }
+.bbg2-num   { color: var(--text-mute); font-size: 11px; font-weight: 600; }
+.bbg2-tick  { font-weight: 700; font-family: monospace; letter-spacing:.04em; color:var(--text); }
+.bbg2-warn  { font-size: 9.5px; color: #d97706; font-weight: 600; }
+.bbg2-wt    { color: var(--theme-purple); font-weight: 700; }
+.bbg2-tot   {
+    grid-template-columns: 0.4fr 1.2fr 1.7fr 4.0fr;
+    background: #f8f4fa; border-top: 2px solid var(--theme-purple-light);
+    padding: 9px 8px; font-size: 11.5px;
+}
+.bbg2-tot .lbl     { color: var(--theme-purple); font-weight: 700; }
+.bbg2-tot .planned { font-weight: 700; color: var(--text); }
+.bbg2-tot .sub     { color: var(--text-mute); font-size: 9.5px; }
+.bbg2-tot .summary { text-align: right; line-height: 1.7; }
+.bbg2-tot .summary .k { color: var(--text-mute); }
+.bbg2-tot .cash-pos   { color: var(--gain); font-weight: 700; }
+.bbg2-tot .cash-neg   { color: #cc0000; font-weight: 700; }
+
+/* ── Compact strategy selector — single row, segmented-button style ── */
+[class*="st-key-p2_strat_"] button {
+    padding: 4px 14px !important;
+    min-height: 28px !important;
+    height: 28px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.04em !important;
+    border-radius: 3px !important;
+    border: 1px solid #d4c4dc !important;
+    background: var(--bg) !important;
+    color: #555 !important;
+    transition: all 0.12s ease !important;
+}
+[class*="st-key-p2_strat_"] button:hover:not(:disabled) {
+    background: #f7f0fb !important;
+    border-color: #9960aa !important;
+    color: var(--theme-purple) !important;
+}
+[class*="st-key-p2_strat_"] button:disabled {
+    background: #f5f3f7 !important;
+    border-color: #e5dce8 !important;
+    color: #aaa !important;
+    cursor: not-allowed !important;
+    opacity: 0.65 !important;
+}
+.p2-strat-bar { margin-bottom: 12px; }
+
+/* ── Summary candidate row — replaces the inline expanded panel ── */
+[class*="st-key-p2_summary_"] button {
+    text-align: left !important;
+    padding: 11px 16px 12px !important;
+    min-height: 64px !important;
+    height: auto !important;
+    white-space: pre-line !important;
+    background: var(--bg) !important;
+    border: 1px solid #d4c4dc !important;
+    border-left: 3px solid var(--theme-purple-light) !important;
+    border-radius: 4px !important;
+    color: var(--text) !important;
+    font-size: 11.5px !important;
+    line-height: 1.55 !important;
+    width: 100% !important;
+    transition: border-color 0.12s, box-shadow 0.12s, background 0.12s !important;
+    margin-bottom: 8px !important;
+}
+[class*="st-key-p2_summary_"] button:hover:not(:disabled) {
+    border-color: var(--theme-purple) !important;
+    border-left-color: var(--theme-purple) !important;
+    background: #faf6fc !important;
+    box-shadow: 0 2px 8px rgba(102,8,116,0.10) !important;
+}
+[class*="st-key-p2_summary_"] button:disabled {
+    background: #f5f3f7 !important;
+    color: var(--text-mute) !important;
+    border-left-color: #ccc !important;
+    cursor: not-allowed !important;
+    opacity: 0.7 !important;
+}
+
+/* ── Sub-page header (back nav + strategy title) ── */
+.p2-sub-header {
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e8ddf0;
+}
+.p2-sub-title {
+    font-size: 17px; font-weight: 700; color: var(--text);
+    letter-spacing: 0.01em; margin: 6px 0 2px;
+}
+.p2-sub-subtitle {
+    font-size: 11px; color: #777;
+}
+.p2-coming-soon {
+    background: #faf7fc;
+    border: 1px dashed #c9b8d4;
+    border-radius: 4px;
+    padding: 30px 24px;
+    text-align: center;
+    color: var(--text-mute);
+    font-size: 12px;
+}
+.p2-coming-soon b { color: var(--theme-purple); font-weight: 700; }

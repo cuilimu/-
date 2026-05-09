@@ -1,0 +1,198 @@
+.p8-gate-card {
+    background: #f7f5f9;
+    border: 1px solid var(--theme-purple-dark);
+    border-top: 3px solid var(--theme-purple);
+    border-radius: 2px;
+    padding: 16px 24px;
+    max-width: 100%;
+}
+.p8-blocked-badge {
+    display: inline-block;
+    background: #8a0a9e;
+    color: var(--bg);
+    font-family: Inter, sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+}
+.p8-gate-headline {
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 4px 0;
+}
+.p8-gate-subcopy {
+    font-family: Inter, sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+    max-width: 720px;
+}
+.p8-dep-chain {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-top: 8px;
+}
+.p8-dep-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 88px;
+}
+.p8-dep-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Inter, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+}
+.p8-dep-circle-active {
+    background: var(--theme-purple);
+    color: var(--bg);
+    border: none;
+}
+.p8-dep-circle-locked {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+.p8-dep-label {
+    font-family: Inter, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text);
+}
+.p8-dep-label-locked { color: var(--text-secondary); }
+.p8-dep-status {
+    font-family: Inter, sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.p8-dep-arrow {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    color: #c9a4d4;
+    font-weight: 400;
+    padding-top: 2px;
+}
+
+/* ── Terminal status line ─────────────────────────────────── */
+.p8-terminal-status {
+    background: #1a0220;
+    border: 1px solid var(--theme-purple-dark);
+    border-radius: 2px;
+    padding: 6px 14px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 6px;
+    margin-top: 8px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 10px;
+    line-height: 1.4;
+}
+.p8-ts-prefix {
+    color: #c9a4d4;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+.p8-ts-sep {
+    color: #c9a4d4;
+    white-space: nowrap;
+}
+.p8-ts-value {
+    color: var(--bg);
+    font-weight: 400;
+    flex: 1 1 200px;
+    min-width: 0;
+}
+.p8-ts-state {
+    color: #c9a4d4;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+/* ── Pillar grid ──────────────────────────────────────────── */
+.p8-pillar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px;
+    margin-top: 16px;
+}
+.p8-pillar-card {
+    background: #f8f8f8;
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--theme-purple);
+    border-radius: 2px;
+    padding: 12px 8px 8px 8px;
+    min-width: 0;
+}
+.p8-pillar-header {
+    font-family: Inter, sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--theme-purple);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+.p8-action-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    min-height: 24px;
+    margin-bottom: 4px;
+}
+.p8-key-chip {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 9px;
+    font-weight: 400;
+    color: #c9a4d4;
+    background: #1a0220;
+    padding: 2px 5px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    line-height: 1.3;
+}
+.p8-action-desc {
+    font-family: Inter, sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    flex: 1;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
+}
+.p8-action-needs-combo {
+    color: #c9a4d4;
+    font-size: 8px;
+    margin-left: 4px;
+    flex-shrink: 0;
+}
+
+/* CTA spacer + button overrides scoped to empty state */
+.p8-cta-spacer { height: 16px; }

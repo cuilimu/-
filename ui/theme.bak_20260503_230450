@@ -1,0 +1,297 @@
+"""
+ui/theme.py — Single source of truth for all colors, fonts, spacing.
+Two-zone system: Sidebar (Tsinghua Purple) + Main (white).
+NO hardcoded colors anywhere else in the codebase.
+"""
+
+# ── Sidebar / Control zone ─────────────────────────────────────────────────────
+SIDEBAR_BG           = "#660874"
+SIDEBAR_BG_DARK      = "#4a0554"
+SIDEBAR_INPUT_BG     = "#3a0442"
+SIDEBAR_BORDER       = "#c084d4"
+SIDEBAR_BTN_BG       = "#8a0a9e"
+SIDEBAR_BTN_HOVER    = "#660874"
+SIDEBAR_ACTIVE       = "#c084d4"
+SIDEBAR_TEXT         = "#FFFFFF"
+
+# ── Main / Display zone ────────────────────────────────────────────────────────
+MAIN_BG              = "#FFFFFF"
+MAIN_TEXT            = "#1a1a1a"
+MAIN_TEXT_SECONDARY  = "#666666"
+CARD_BG              = "#f8f8f8"
+CARD_BG_PURPLE       = "#f8f4fa"
+CARD_BORDER          = "#e0e0e0"
+SECTION_HEADER       = "#660874"
+
+# ── P&L color convention (US market standard) ──────────────────────────────────
+COLOR_GAIN           = "#00b050"
+COLOR_LOSS           = "#e03030"
+COLOR_NEUTRAL        = "#666666"
+
+# ── Chart zone (stays dark) ───────────────────────────────────────────────────
+CHART_BG             = "#111111"
+CHART_GRID           = "#222222"
+CHART_TEXT           = "#FAFAFA"
+CHART_PORTFOLIO      = "#42A5F5"
+CHART_BENCHMARK      = "#90A4AE"
+CHART_SERIES_PALETTE = [
+    "#42A5F5", "#26A69A", "#FFA726", "#AB47BC",
+    "#EF5350", "#66BB6A", "#FF7043", "#26C6DA",
+]
+
+# ── Typography ─────────────────────────────────────────────────────────────────
+FONT_FAMILY          = "Inter, sans-serif"
+FONT_SIZE_BASE       = 12
+
+# ── Spacing ────────────────────────────────────────────────────────────────────
+SPACING_SM           = 4
+SPACING_MD           = 8
+SPACING_LG           = 12
+
+# ── Streamlit injected CSS ─────────────────────────────────────────────────────
+# Fix 7: explicit selectors with !important for full sidebar visibility
+CUSTOM_CSS = """
+<style>
+/* ── Global ── */
+html, body, [data-testid="stAppViewContainer"] {
+    font-family: Inter, sans-serif;
+    background-color: #FFFFFF;
+    color: #1a1a1a;
+}
+
+/* ── Sidebar zone (Fix 7) ── */
+section[data-testid="stSidebar"] {
+    background-color: #660874 !important;
+}
+section[data-testid="stSidebar"] * {
+    color: #FFFFFF !important;
+}
+section[data-testid="stSidebar"] input {
+    background-color: #3a0442 !important;
+    color: #FFFFFF !important;
+    border: 1px solid #c084d4 !important;
+}
+section[data-testid="stSidebar"] textarea {
+    background-color: #3a0442 !important;
+    color: #FFFFFF !important;
+}
+section[data-testid="stSidebar"] .stSelectbox > div > div {
+    background-color: #3a0442 !important;
+    color: #FFFFFF !important;
+    border: 1px solid #c084d4 !important;
+}
+section[data-testid="stSidebar"] .stSelectbox svg {
+    fill: #FFFFFF !important;
+}
+section[data-testid="stSidebar"] label {
+    color: #FFFFFF !important;
+}
+section[data-testid="stSidebar"] p {
+    color: #FFFFFF !important;
+}
+section[data-testid="stSidebar"] .stRadio label {
+    color: #FFFFFF !important;
+}
+section[data-testid="stSidebar"] .stButton > button {
+    background-color: #8a0a9e !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    font-weight: 600;
+}
+section[data-testid="stSidebar"] .stButton > button:hover {
+    background-color: #660874 !important;
+}
+
+/* ── Main zone ── */
+[data-testid="stMain"] {
+    background-color: #FFFFFF;
+    color: #1a1a1a;
+}
+
+/* ── Group cards (Fix 8) ── */
+.engine-card {
+    background: #FFFFFF;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    box-shadow: none;
+    margin-bottom: 5px;
+    overflow: hidden;
+}
+.engine-card-header {
+    background: #f8f4fa;
+    padding: 5px 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 4px 4px 0 0;
+}
+.engine-card-header:hover {
+    background: #ede0f5;
+}
+.engine-card-title {
+    color: #660874;
+    font-weight: 700;
+    font-size: 12px;
+}
+.engine-card-body {
+    padding: 8px 10px;
+}
+.metric-label {
+    color: #888888;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+.metric-value {
+    color: #1a1a1a;
+    font-size: 13px;
+    font-weight: 700;
+}
+.metric-value-gain {
+    color: #00b050;
+    font-size: 13px;
+    font-weight: 700;
+}
+.metric-value-loss {
+    color: #e03030;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* ── Summary bar (Fix 9) ── */
+.summary-bar {
+    background: #f8f4fa;
+    border: 1px solid #e0e0e0;
+    border-left: 4px solid #660874;
+    border-radius: 4px;
+    padding: 4px 10px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* ── Section headers ── */
+.section-header {
+    color: #660874;
+    font-weight: 700;
+    font-size: 12px;
+    margin-bottom: 4px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #f0e0f8;
+}
+
+/* ── P&L classes ── */
+.gain  { color: #00b050; font-weight: 600; }
+.loss  { color: #e03030; font-weight: 600; }
+.flat  { color: #666666; }
+
+/* ── Empty state (Fix 9) ── */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666666;
+}
+.empty-state h3 {
+    color: #660874;
+    margin-bottom: 8px;
+    font-size: 20px;
+}
+
+/* ── Ticker search rows (Fix 5+6) ── */
+.ticker-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 8px;
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    font-size: 12px;
+    background: #FFFFFF;
+    transition: background 0.15s;
+}
+.ticker-row:hover {
+    background: #f0e8f5;
+}
+.ticker-symbol { font-weight: 700; color: #1a1a1a; }
+.ticker-name   { color: #666666; font-size: 12px; }
+.exchange-badge {
+    background: #f0e0f8;
+    color: #660874;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* ── Holdings table ── */
+.holdings-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.holdings-table th {
+    background: #f8f8f8;
+    color: #666666;
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+.holdings-table td {
+    padding: 3px 7px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+}
+.holdings-ticker { font-weight: 700; font-size: 12px; color: #1a1a1a; }
+.holdings-sub    { font-size: 11px; color: #666666; }
+
+/* ── Inline notes/warnings ── */
+.inline-warn { color: #e03030; font-size: 12px; }
+.inline-note { color: #888888; font-size: 11px; }
+/* ── Sidebar number input +/- buttons (Fix 4) ── */
+section[data-testid="stSidebar"] div[data-testid="stNumberInput"] > div {
+    background-color: #3a0442 !important;
+    border: 1px solid #c084d4 !important;
+    border-radius: 4px;
+}
+section[data-testid="stSidebar"] div[data-testid="stNumberInput"] input {
+    color: #FFFFFF !important;
+    background-color: #3a0442 !important;
+}
+section[data-testid="stSidebar"] div[data-testid="stNumberInput"] button {
+    color: #FFFFFF !important;
+    background-color: #4a0554 !important;
+    border: none !important;
+}
+section[data-testid="stSidebar"] div[data-testid="stNumberInput"] button:hover {
+    background-color: #660874 !important;
+}
+section[data-testid="stSidebar"] div[data-testid="stDateInput"] > div {
+    background-color: #3a0442 !important;
+    border: 1px solid #c084d4 !important;
+}
+section[data-testid="stSidebar"] div[data-testid="stDateInput"] input {
+    color: #FFFFFF !important;
+    background-color: #3a0442 !important;
+}
+section[data-testid="stSidebar"] div[data-testid="stSegmentedControl"] {
+    background-color: #4a0554 !important;
+}
+section[data-testid="stSidebar"] div[data-testid="stSegmentedControl"] button {
+    color: #FFFFFF !important;
+}
+section[data-testid="stSidebar"] div[data-testid="stToggle"] * {
+    color: #FFFFFF !important;
+}
+section[data-testid="stSidebar"] hr {
+    border-color: #8a0a9e !important;
+}
+</style>
+"""
+
+COLOR_NEUTRAL = '#808080'  # or add near top with other COLOR_* definitions
+
+

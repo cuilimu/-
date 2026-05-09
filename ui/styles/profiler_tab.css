@@ -1,0 +1,89 @@
+.prof-card {
+    background: #f8f8f8;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 4px;
+}
+.prof-card-header {
+    color: var(--theme-purple);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e8d8f0;
+}
+.prof-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 3px 0;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.prof-row:last-child { border-bottom: none; }
+.prof-label { color: var(--text-secondary); }
+.prof-value { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+.prof-value-gain { font-weight: 600; color: #059669; }
+.prof-value-loss { font-weight: 600; color: #be123c; }
+.prof-value-neutral { font-weight: 600; color: var(--text-secondary); }
+
+.lev-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+}
+.lev-ratio {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+.lev-metric-label { color: var(--text-mute); font-size: 11px; text-transform: uppercase; }
+.lev-metric-value { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+
+.chip {
+    display: inline-block;
+    background: #f0e8f5;
+    color: var(--theme-purple);
+    border-radius: 16px;
+    padding: 3px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin: 2px;
+}
+.chip-neutral {
+    display: inline-block;
+    background: #f5f5f5;
+    color: var(--text-secondary);
+    border-radius: 16px;
+    padding: 3px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin: 2px;
+}
+.amber-banner {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: #92400e;
+    margin-bottom: 12px;
+}
+.info-note {
+    color: var(--text-mute);
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+/* ── Graphviz flowchart sizing ───────────────────────────────────────── */
+[data-testid="stGraphVizChart"] svg {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 760px;
+    display: block;
+}
