@@ -6,7 +6,6 @@ All containers are plain dataclasses; no business logic lives here.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict
 from typing import Literal
 
 import pandas as pd
@@ -71,27 +70,12 @@ class FactorCorrelationMatrix:
 
 
 @dataclass
-class ValidationResult:
-    """Cross-validation metrics for one factor (live vs static reference)."""
-
-    factor_name: str
-    ff_proxy: str             # e.g. "HML", "Mom"
-    period_start: pd.Timestamp
-    period_end: pd.Timestamp
-    n_overlap: int            # overlapping months
-    pearson_r: float          # Pearson correlation between live and static series
-    r_squared: float          # R² of live ~ static regression
-    beta: float               # slope coefficient (static -> live)
-    validated: bool           # True when pearson_r >= validation_threshold
-
-
-@dataclass
 class FactorInvestingResult:
-    """Top-level result object returned by FactorInvestingEngine.run_quick()."""
+    """Top-level result object returned by FactorInvestingEngine.run_live()."""
 
     factor_stats: list[FactorStats]
     quintile_returns: list[QuintileResult]   # one per factor; empty for live/missing
     correlation: FactorCorrelationMatrix
     source: Literal["precomputed", "computed", "live"]
     as_of_date: pd.Timestamp
-    qspread_series: Dict[str, pd.Series] = field(default_factory=dict)  # raw series for charts
+    qspread_series: dict[str, pd.Series] = field(default_factory=dict)  # raw series for charts

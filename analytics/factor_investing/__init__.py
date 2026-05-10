@@ -1,10 +1,9 @@
 """
 analytics/factor_investing — Factor-investing analytics sub-package.
 
-End-to-end pipeline: load pre-computed Q-spread series from CapitalIQ →
-compute summary statistics (annualised return, Sharpe, ACF, t-stat) →
-cross-factor correlation matrix → optional per-quintile return loading →
-FactorInvestingResult.
+Live pipeline: download Q-spread return series from Kenneth French's Data
+Library → compute summary statistics (annualised return, Sharpe, ACF, t-stat)
+→ cross-factor correlation matrix → FactorInvestingResult.
 
 Public surface (import from here, not from sub-modules):
 
@@ -21,20 +20,16 @@ from stock_engine.analytics.factor_investing.types import (
     FactorInvestingResult,
     FactorStats,
     QuintileResult,
-    ValidationResult,
 )
 from stock_engine.analytics.factor_investing.engine import FactorInvestingEngine
 from stock_engine.analytics.factor_investing.live_loader import FACTOR_FF_LABEL
-from stock_engine.analytics.factor_investing.validator import cross_validate
 
 __all__ = [
     "FactorStats",
     "QuintileResult",
     "FactorCorrelationMatrix",
     "FactorInvestingResult",
-    "ValidationResult",
     "FactorInvestingEngine",
     "CORE_FACTORS",
     "FACTOR_FF_LABEL",
-    "cross_validate",
 ]

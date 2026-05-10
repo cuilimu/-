@@ -1,0 +1,232 @@
+/* page_daily_brief.css — styles for Step 1 Daily Market Brief page.
+   Class prefix `db-` keeps these scoped to this page only. */
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────── */
+
+.db-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0 6px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 14px;
+    box-sizing: border-box;
+}
+
+.db-toolbar-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.db-toolbar-title {
+    font-size: 11px;
+    color: var(--text);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.db-toolbar-subtitle {
+    font-size: 9px;
+    color: var(--text-mute);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+/* ── Past-summaries list ─────────────────────────────────────────────────── */
+
+.db-thesis-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.db-thesis-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-left: 3px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-left-color 0.15s, background 0.15s;
+    background: var(--bg);
+}
+
+.db-thesis-card:hover {
+    border-left-color: var(--theme-purple);
+    background: color-mix(in srgb, var(--theme-purple) 4%, var(--bg));
+}
+
+.db-thesis-card--active {
+    border-left-color: var(--theme-purple);
+    background: color-mix(in srgb, var(--theme-purple) 6%, var(--bg));
+}
+
+.db-thesis-date {
+    font-size: 10px;
+    color: var(--text-mute);
+    letter-spacing: .04em;
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 72px;
+    padding-top: 1px;
+}
+
+.db-thesis-text {
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.5;
+    flex: 1;
+}
+
+/* ── Full-report body ────────────────────────────────────────────────────── */
+
+.db-report-wrap {
+    background: color-mix(in srgb, var(--theme-purple) 2%, var(--bg));
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--theme-purple);
+    padding: 18px 22px;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text);
+    margin-top: 12px;
+}
+
+.db-report-wrap h1,
+.db-report-wrap h2,
+.db-report-wrap h3 {
+    color: var(--theme-purple);
+    margin-top: 18px;
+    margin-bottom: 8px;
+    letter-spacing: .02em;
+}
+
+.db-report-wrap h2 {
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 4px;
+}
+
+.db-report-wrap h3 {
+    font-size: 12.5px;
+}
+
+.db-report-wrap ul,
+.db-report-wrap ol {
+    margin: 6px 0 10px 0;
+    padding-left: 22px;
+}
+
+.db-report-wrap li {
+    margin: 3px 0;
+}
+
+.db-report-wrap strong {
+    color: var(--theme-purple);
+}
+
+.db-report-wrap a {
+    color: var(--theme-purple);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--text-mute);
+}
+
+.db-report-wrap a:hover {
+    border-bottom-style: solid;
+}
+
+.db-report-wrap blockquote {
+    border-left: 2px solid var(--text-mute);
+    margin: 8px 0;
+    padding: 2px 12px;
+    color: var(--text-mute);
+}
+
+.db-report-wrap table {
+    font-size: 11px;
+    border-collapse: collapse;
+    width: 100%;
+    margin: 8px 0;
+}
+
+.db-report-wrap th,
+.db-report-wrap td {
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    text-align: left;
+}
+
+.db-report-wrap th {
+    background: color-mix(in srgb, var(--theme-purple) 8%, var(--bg));
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+/* ── Setup / error hint card ─────────────────────────────────────────────── */
+
+.db-empty-wrap {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 16px;
+}
+
+.db-empty-card {
+    background: color-mix(in srgb, var(--theme-purple) 3%, var(--bg));
+    border-left: 2px solid var(--theme-purple);
+    border-radius: 4px;
+    padding: 12px 18px;
+    max-width: 520px;
+    width: 100%;
+}
+
+.db-empty-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.db-empty-body {
+    font-size: 11px;
+    color: var(--text-mute);
+    line-height: 1.55;
+    margin: 0;
+}
+
+.db-empty-body a {
+    color: var(--theme-purple);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.db-empty-body a:hover {
+    text-decoration: underline;
+}
+
+.db-error-text {
+    color: var(--text);
+    font-size: 10px;
+    font-family: 'SF Mono', 'Consolas', monospace;
+    opacity: 0.75;
+}
+
+/* ── Section label ───────────────────────────────────────────────────────── */
+
+.db-section-label {
+    font-size: 9px;
+    color: var(--text-mute);
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 6px;
+    margin-top: 2px;
+}

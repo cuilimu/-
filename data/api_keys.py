@@ -173,6 +173,15 @@ KEY_REGISTRY: list[dict] = [
         "signup_url":  "https://developers.notion.com/reference/retrieve-a-database",
         "test":        _test_notion_db_id,
     },
+    {
+        "id":          "notion_daily_db_id",
+        "label":       "Daily Brief DB ID",
+        "name":        "Notion Daily Brief Database ID",
+        "description": "The 32-char ID of your 'Claude News' Daily Brief database. "
+                       "Found in the database URL. The app writes daily summaries here.",
+        "signup_url":  "https://developers.notion.com/reference/retrieve-a-database",
+        "test":        _test_notion_db_id,
+    },
 ]
 
 

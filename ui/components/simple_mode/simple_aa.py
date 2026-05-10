@@ -34,7 +34,8 @@ from stock_engine.ui.components.simple_mode.page_taa import render_page_taa
 from stock_engine.ui.components.simple_mode.page2_allocation import render_page2
 from stock_engine.ui.components.simple_mode.page3_performance import render_page3
 from stock_engine.ui.components.simple_mode.page4_risk import render_page4
-# Macro Overview and SAA intentionally stubbed — content paused pending review.
+from stock_engine.ui.components.simple_mode.page_daily_brief import render_page_daily_brief
+# SAA intentionally stubbed — content paused pending review.
 from stock_engine.ui.components.simple_mode.page8_arimax import render_page8_arimax
 from stock_engine.ui.components.simple_mode.page_factor_investing import render_page_factor_investing
 from stock_engine.ui.components.simple_mode.page_stub import render_stub
@@ -105,7 +106,7 @@ def render_simple_aa(config: Config) -> None:
     with col_main:
         _render_topbar(current_step)
         if current_step == 1:
-            render_stub(current_step)        # Macro Overview — content paused
+            render_page_daily_brief()
         elif current_step == 2:
             render_page1(config)
         elif current_step == 3:

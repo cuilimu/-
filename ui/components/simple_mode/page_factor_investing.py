@@ -1,16 +1,14 @@
 """
 ui/components/simple_mode/page_factor_investing.py — Factor Investing Workbench tab.
 
-Layout: 260px left config pane | main display with 4 sub-tabs.
-  Config: data source toggle, factor multi-select, date range, Run Analysis.
+Layout: 260px left config pane | main display with 5 sub-tabs.
+  Config: factor multi-select, date range, Run Analysis.
   Overview: factor stats table with significance chips.
   QSpread Returns: cumulative long-short factor return charts.
   Correlations: cross-factor correlation heatmap.
   Score My Portfolio: rank session tickers on live factor proxies via yfinance.
 
-Data sources:
-  Live (default): Fama-French Data Library via pandas_datareader.
-  Custom File: user-supplied CapitalIQ CSV + Factor_SP500 XLSX paths.
+Data source: Fama-French Data Library (live, no local files required).
 """
 from __future__ import annotations
 
@@ -28,10 +26,7 @@ from stock_engine.analytics.factor_investing import (
     FactorInvestingEngine,
     FactorInvestingResult,
     FactorStats,
-    ValidationResult,
-    cross_validate,
 )
-from stock_engine.analytics.factor_investing.loader import load_qspread_series
 from stock_engine.analytics.factor_investing.theory import (
     FACTOR_THEORY,
     PORTFOLIO_CONSTRUCTION,
@@ -44,28 +39,16 @@ from stock_engine.ui.theme import CHART_SERIES_PALETTE, CORR_COLORSCALE
 from stock_engine.viz.theme import ARX_LIGHT_THEME
 
 # Session-state keys
-_K_RESULT     = "fi_result"
-_K_SOURCE     = "fi_data_source"   # "live" | "custom"
-_K_SCORES     = "fi_portfolio_scores"
-_K_TILT_ON    = "fi_tilt_active"
-_K_VALIDATION = "fi_validation"    # list[ValidationResult] | None
-
-# Default reference path for cross-validation (user's own CapitalIQ compute).
-# Only used as a VALIDATION cross-check, never as the primary data source.
-_VALIDATION_CAPITALIQ_DEFAULT = (
-    r"C:\Users\Limu\Documents\2026 Spring"
-    r"\RSM 6308 Advanced Investments\Project 1 data"
-    r"\CapitalIQ_extend.csv"
-)
+_K_RESULT  = "fi_result"
+_K_SCORES  = "fi_portfolio_scores"
+_K_TILT_ON = "fi_tilt_active"
 
 
 # ── Session state ──────────────────────────────────────────────────────────────
 
 def _init_state() -> None:
-    st.session_state.setdefault(_K_RESULT,     None)
-    st.session_state.setdefault(_K_SOURCE,     "live")
-    st.session_state.setdefault(_K_SCORES,     None)
-    st.session_state.setdefault(_K_VALIDATION, None)
+    st.session_state.setdefault(_K_RESULT, None)
+    st.session_state.setdefault(_K_SCORES, None)
     st.session_state.setdefault("fi_chart_factor", CORE_FACTORS[0])
 
 
@@ -419,110 +402,31 @@ def _build_score_table_html(df: pd.DataFrame) -> str:
 
 # ── Run analysis ───────────────────────────────────────────────────────────────
 
-def _run_analysis(
-    factors: list[str],
-    source: str,
-    start: str,
-    capitaliq_path: str,
-    factor_sp500_path: str,
-    validation_path: str,
-) -> None:
+def _run_analysis(factors: list[str], start: str) -> None:
     if not factors:
         st.warning("Select at least one factor.")
         return
 
-    engine = FactorInvestingEngine(
-        capitaliq_path=capitaliq_path or None,
-        factor_sp500_path=factor_sp500_path or None,
-    )
-
-    if source == "compute":
-        # Tier-2: show live progress during long computation
-        status_box = st.empty()
-        def _progress(msg: str) -> None:
-            status_box.info(f"⏳ {msg}")
-
-        result = engine.run_compute(factors=factors, start=start, progress_cb=_progress)
-        status_box.empty()
-    else:
-        with st.spinner("Loading factor data…"):
-            if source == "live":
-                result = engine.run_live(factors=factors, start=start)
-            else:
-                result = engine.run_quick(factors=factors)
+    engine = FactorInvestingEngine()
+    with st.spinner("Loading factor data…"):
+        result = engine.run_live(factors=factors, start=start)
 
     st.session_state[_K_RESULT] = result
     st.session_state[_K_SCORES] = None
-    st.session_state[_K_VALIDATION] = None
-
-    # Cross-validation against static reference (live or computed modes)
-    if source in ("live", "compute") and result.qspread_series:
-        vpath = validation_path.strip() if validation_path else _VALIDATION_CAPITALIQ_DEFAULT
-        try:
-            static_dict = load_qspread_series(vpath, factors=factors)
-            if static_dict:
-                val_results = cross_validate(result.qspread_series, static_dict)
-                st.session_state[_K_VALIDATION] = val_results
-        except Exception:
-            pass
-
     st.rerun()
 
 
 # ── Config pane ────────────────────────────────────────────────────────────────
 
-def _render_config_pane(config: Config) -> tuple[list[str], str, str, str, str, str]:
+def _render_config_pane(config: Config) -> tuple[list[str], str]:
     """Render left config panel.
 
     Returns
     -------
-    (selected_factors, source, start, capitaliq_path, sp500_path, validation_path)
+    (selected_factors, start_str)
     """
 
-    # ── Data source ───────────────────────────────────────────────────────────
-    st.markdown('<div class="fi-config-label">DATA SOURCE</div>', unsafe_allow_html=True)
-    _SRC_LABELS = {
-        "live":    "Live · Fama-French",
-        "compute": "Compute · Daily data",
-        "custom":  "Custom File",
-    }
-    source = st.radio(
-        "Data source",
-        list(_SRC_LABELS.keys()),
-        index=0,
-        key="fi_data_source",
-        format_func=_SRC_LABELS.get,
-        label_visibility="collapsed",
-    )
-
-    capitaliq_path = ""
-    factor_sp500_path = ""
-
-    if source == "live":
-        st.caption("Downloads from Kenneth French's Data Library · Updated monthly")
-    elif source == "compute":
-        st.caption(
-            "Downloads S&P 500 daily prices via yfinance, computes 5 price-based "
-            "factors from scratch. BP/LTGC supplemented from Fama-French. "
-            "First run: ~1-2 min · cached 24h."
-        )
-    else:
-        st.caption("Point to your own CapitalIQ CSV + Factor XLSX files.")
-        capitaliq_path = st.text_input(
-            "CapitalIQ CSV path",
-            key="fi_capitaliq_path",
-            placeholder=r"C:\...\CapitalIQ_extend.csv",
-            label_visibility="visible",
-        )
-        factor_sp500_path = st.text_input(
-            "Factor_SP500 XLSX path",
-            key="fi_factor_sp500_path",
-            placeholder=r"C:\...\Factor_SP500.xlsx",
-            label_visibility="visible",
-        )
-
     # ── Date range ────────────────────────────────────────────────────────────
-    st.markdown('<div class="fi-config-sep"></div>', unsafe_allow_html=True)
     st.markdown('<div class="fi-config-label">DATE RANGE</div>', unsafe_allow_html=True)
     start_str = config.default_start_date or "1990-01-01"
     st.caption(f"Start: {start_str}  ·  End: latest")
@@ -540,53 +444,21 @@ def _render_config_pane(config: Config) -> tuple[list[str], str, str, str, str, 
     # ── Methodology note ──────────────────────────────────────────────────────
     st.markdown('<div class="fi-config-sep"></div>', unsafe_allow_html=True)
     st.markdown('<div class="fi-config-label">METHODOLOGY</div>', unsafe_allow_html=True)
-    if source == "live":
-        st.caption(
-            "Long-short factor return series from Fama-French. "
-            "Not a raw quintile sort — see French Data Library documentation."
-        )
-    elif source == "compute":
-        st.caption(
-            "Quintile sort on S&P 500 · Equal-weight · 1M holding lag · "
-            "Winsorized 1/99% · 252-day rolling windows for Beta and Vol."
-        )
-    else:
-        st.caption("Quintile sort · Equal-weight · 1M holding lag · Winsorized 1/99%")
-
-    # ── Validation reference ──────────────────────────────────────────────────
-    st.markdown('<div class="fi-config-sep"></div>', unsafe_allow_html=True)
-    st.markdown('<div class="fi-config-label">VALIDATION REF.</div>', unsafe_allow_html=True)
-    st.caption("CapitalIQ Q-spread CSV used as cross-check against live data.")
-    validation_path = st.text_input(
-        "CapitalIQ ref. path (optional)",
-        value=_VALIDATION_CAPITALIQ_DEFAULT,
-        key="fi_validation_path",
-        label_visibility="collapsed",
-        help="Leave blank or point to your CapitalIQ_extend.csv. "
-             "Auto-compared with live data in the Validation tab.",
+    st.caption(
+        "Long-short factor return series from Fama-French Data Library. "
+        "Updated monthly. Not a raw quintile sort — see French Data Library documentation."
     )
-    val_results = st.session_state.get(_K_VALIDATION)
-    if val_results:
-        n_ok = sum(1 for v in val_results if v.validated)
-        n_total = len(val_results)
-        tag = ":green[Validated]" if n_ok == n_total else ":orange[Partial]"
-        st.caption(f"{tag} — {n_ok}/{n_total} factors r ≥ 0.80")
 
     # ── Run button ────────────────────────────────────────────────────────────
     with st.container(key="fi_run_btn"):
         if st.button("Run Analysis", key="fi_run",
                      use_container_width=True, type="primary"):
-            _run_analysis(
-                selected, source, start_str,
-                capitaliq_path, factor_sp500_path, validation_path,
-            )
+            _run_analysis(selected, start_str)
 
     result: Optional[FactorInvestingResult] = st.session_state.get(_K_RESULT)
     if result is not None:
-        _SRC_MAP = {"live": "Fama-French (live)", "computed": "S&P 500 daily compute", "precomputed": "CapitalIQ static"}
-    src_label = _SRC_MAP.get(result.source, result.source)
         st.caption(
-            f"Source: {src_label}  ·  "
+            f"Source: Fama-French (live)  ·  "
             f"As of: {result.as_of_date.strftime('%b %Y')}"
         )
 
@@ -596,19 +468,17 @@ def _render_config_pane(config: Config) -> tuple[list[str], str, str, str, str, 
             unsafe_allow_html=True,
         )
 
-    return selected, source, start_str, capitaliq_path, factor_sp500_path, validation_path
+    return selected, start_str
 
 
 # ── Tab renderers ──────────────────────────────────────────────────────────────
 
 def _render_overview(result: FactorInvestingResult) -> None:
-    _SRC_MAP = {"live": "Fama-French (live)", "computed": "S&P 500 daily compute", "precomputed": "CapitalIQ static"}
-    src_label = _SRC_MAP.get(result.source, result.source)
     n = len(result.factor_stats)
     st.markdown(
         f'<div class="fi-results-bar">'
         f"FACTOR STATISTICS — LONG/SHORT SPREAD"
-        f'<span class="fi-results-count">{n} factors · {src_label} · monthly</span>'
+        f'<span class="fi-results-count">{n} factors · Fama-French (live) · monthly</span>'
         f"</div>",
         unsafe_allow_html=True,
     )
@@ -639,17 +509,11 @@ def _render_qspread_returns(result: FactorInvestingResult) -> None:
     fig = _qspread_chart(result, selected)
     st.plotly_chart(fig, use_container_width=True)
 
-    if result.source == "live":
-        st.caption(
-            "Cumulative return of the long-short (Q5 − Q1 equivalent) factor portfolio "
-            "sourced from Kenneth French's Data Library. "
-            "Positive → the factor premium was positive over the period."
-        )
-    else:
-        st.caption(
-            "Cumulative return of each quintile portfolio and the long-short spread (QSpread = Q5 − Q1). "
-            "Q5 = top-quintile stocks, Q1 = bottom-quintile stocks. Equal-weighted, 1-month holding lag."
-        )
+    st.caption(
+        "Cumulative return of the long-short (Q5 − Q1 equivalent) factor portfolio "
+        "sourced from Kenneth French's Data Library. "
+        "Positive → the factor premium was positive over the period."
+    )
 
 
 def _render_correlations(result: FactorInvestingResult) -> None:
@@ -792,86 +656,6 @@ def _render_theory(selected_factors: list[str]) -> None:
                 st.caption(f"• {ref}")
 
 
-def _render_validation(val_results: list[ValidationResult]) -> None:
-    """Render the factor reliability / cross-validation table."""
-    if not val_results:
-        st.info(
-            "No validation data available. "
-            "Provide a CapitalIQ reference path in the config pane and re-run analysis."
-        )
-        return
-
-    n_ok = sum(1 for v in val_results if v.validated)
-    n_total = len(val_results)
-    status_label = "All factors validated" if n_ok == n_total else f"{n_ok}/{n_total} factors validated"
-    st.markdown(
-        f'<div class="fi-results-bar">'
-        f"FACTOR RELIABILITY — LIVE vs STATIC CROSS-CHECK"
-        f'<span class="fi-results-count">{status_label} · threshold r ≥ 0.80</span>'
-        f"</div>",
-        unsafe_allow_html=True,
-    )
-    st.caption(
-        "Compares Fama-French long-short returns (live) with CapitalIQ Q-spread returns (static reference) "
-        "over their overlapping date range. High Pearson r confirms that the live data is a reliable proxy "
-        "for the custom quintile-sort methodology."
-    )
-
-    rows = []
-    for v in val_results:
-        r_pct  = f"{v.pearson_r * 100:.1f}%"
-        r2_pct = f"{v.r_squared * 100:.1f}%"
-        beta_s = _fmt(v.beta)
-        period = f"{v.period_start.strftime('%Y-%m')} – {v.period_end.strftime('%Y-%m')}"
-
-        if v.validated:
-            badge = '<span class="fi-sig-chip fi-sig-strong">Validated</span>'
-        elif v.pearson_r >= 0.60:
-            badge = '<span class="fi-sig-chip fi-sig-med">Moderate</span>'
-        else:
-            badge = '<span class="fi-sig-chip fi-sig-weak">Weak</span>'
-
-        rows.append(
-            f"<tr>"
-            f"<td>{v.factor_name}</td>"
-            f"<td>{v.ff_proxy}</td>"
-            f"<td>{period}</td>"
-            f"<td>{v.n_overlap}</td>"
-            f"<td><strong>{r_pct}</strong></td>"
-            f"<td>{r2_pct}</td>"
-            f"<td>{beta_s}</td>"
-            f"<td>{badge}</td>"
-            f"</tr>"
-        )
-    body = "".join(rows)
-    html = (
-        '<table class="fi-stats-table">'
-        "<thead><tr>"
-        "<th>Factor</th>"
-        "<th>FF Proxy</th>"
-        "<th>Overlap Period</th>"
-        '<th class="col-n">N</th>'
-        "<th>Pearson r</th>"
-        "<th>R&sup2;</th>"
-        "<th>Beta</th>"
-        "<th>Status</th>"
-        f"</tr></thead><tbody>{body}</tbody></table>"
-    )
-    st.markdown(html, unsafe_allow_html=True)
-
-    with st.expander("Interpretation"):
-        st.markdown(
-            "**Pearson r** measures the linear correlation between the two monthly return series "
-            "over overlapping periods. r ≥ 0.80 is treated as validated — the live Fama-French "
-            "proxy and the CapitalIQ quintile sort move together closely enough for research use.\n\n"
-            "**Beta** is the OLS slope of `live ~ static`. Beta ≈ 1.0 indicates equal magnitude; "
-            "beta > 1 means the live series is more volatile than the CapitalIQ reference.\n\n"
-            "**Note:** Perfect correlation is not expected — French data uses all NYSE/AMEX/NASDAQ "
-            "stocks while CapitalIQ focuses on S&P 500. Differences in universe and weighting "
-            "produce structural gaps, especially for smaller-cap factors (SMB proxy)."
-        )
-
-
 def _apply_to_selection(scores: pd.DataFrame, sess) -> None:
     top_n = min(10, len(scores))
     top_tickers = list(scores.head(top_n).index)
@@ -909,7 +693,7 @@ def render_page_factor_investing(config: Config) -> None:
 
         with cols[0]:
             with st.container(key="fi_config_pane", border=False):
-                _render_config_pane(config)
+                selected_factors, start_str = _render_config_pane(config)
 
         with cols[1]:
             result: Optional[FactorInvestingResult] = st.session_state.get(_K_RESULT)
@@ -921,25 +705,21 @@ def render_page_factor_investing(config: Config) -> None:
                     "<p>Select factors in the left panel and click "
                     "<strong>Run Analysis</strong>. "
                     "Data is pulled live from Kenneth French's "
-                    "Data Library — no local files required. "
-                    "A cross-validation against your CapitalIQ reference "
-                    "runs automatically in the background.</p>"
+                    "Data Library — no local files required.</p>"
                     "</div>",
                     unsafe_allow_html=True,
                 )
                 return
 
-            val_results: Optional[list] = st.session_state.get(_K_VALIDATION)
-
-            selected_factors: list[str] = [
+            selected_factors = [
                 f for f in CORE_FACTORS
                 if st.session_state.get(f"fi_factor_{f}", True)
             ]
 
             with st.container(key="fi_subtabs"):
                 tab_labels = ["Overview", "L/S Returns", "Correlations",
-                              "Score My Portfolio", "Theory", "Validation"]
-                tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(tab_labels)
+                              "Score My Portfolio", "Theory"]
+                tab1, tab2, tab3, tab4, tab5 = st.tabs(tab_labels)
 
             with tab1:
                 _render_overview(result)
@@ -951,5 +731,3 @@ def render_page_factor_investing(config: Config) -> None:
                 _render_score_portfolio(result)
             with tab5:
                 _render_theory(selected_factors)
-            with tab6:
-                _render_validation(val_results or [])
