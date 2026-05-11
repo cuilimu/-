@@ -1004,17 +1004,18 @@ def _group_comparison_charts(config: Config, group_results: dict):
 
 # ── Single analytics section ───────────────────────────────────────────────────
 def _render_analytics_single(result: BacktestResult, metrics, analytics, config: Config):
+    provider = YFinanceProvider(config)
     st.markdown('<div class="section-header">Multi-Period Return Analysis</div>',
                 unsafe_allow_html=True)
     try:
-        period_returns = compute_multi_period_returns(result, config)
+        period_returns = compute_multi_period_returns(result, provider, config)
         render_multi_period_table(period_returns)
     except Exception as exc:
         st.caption(f"Period returns unavailable: {exc}")
     st.markdown('<div class="section-header">Constituent Returns</div>',
                 unsafe_allow_html=True)
     try:
-        cr_list = compute_constituent_returns(result, config)
+        cr_list = compute_constituent_returns(result, provider, config)
         if cr_list:
             fig_cr = constituent_bar_chart(cr_list, DEFAULT_THEME, config.price_field,
                                            "Constituent Returns")
@@ -1030,11 +1031,11 @@ def _render_analytics_group(config: Config, group_results: dict):
         return
     st.markdown('<div class="section-header">Group Multi-Period Analysis</div>',
                 unsafe_allow_html=True)
-    eng = AnalyticsEngine(config)
+    provider = YFinanceProvider(config)
     for name, res in group_results.items():
         with st.expander(name, expanded=False):
             try:
-                period_returns = compute_multi_period_returns(res, config)
+                period_returns = compute_multi_period_returns(res, provider, config)
                 render_multi_period_table(period_returns)
             except Exception as exc:
                 st.caption(f"Unavailable: {exc}")
